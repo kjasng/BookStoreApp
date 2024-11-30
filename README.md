@@ -1,4 +1,6 @@
-*** Base React Project | Book Store ***
+# Book Store
+
+A modern e-commerce platform for book enthusiasts built with React and TypeScript
 
 ## Use Case
 
@@ -41,5 +43,8 @@ The Book Store application serves as a comprehensive platform for book enthusias
 ## Project setup
 
 ```bash
+git clone https://github.com/kjasng/BookStoreApp.git
+cd BookStoreApp
 npm install
+npm run dev
 ```
