@@ -1,0 +1,13 @@
+Headerm, Footer
+
+HomePage (show all products)
+
+product detail page
+
+cart page
+
+checkout page
+
+login/register page
+
+admin page
