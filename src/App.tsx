@@ -5,13 +5,14 @@ import Footer from '@components/Footer/index.tsx'
 import ContactPage from '@components/pages/contact/index.tsx'
 import BookPage from '@components/pages/book/index.tsx'
 import Home from '@components/Home/index.tsx'
+import Register from './components/pages/register'
 
 
 const Layout = () => {
   return (
-    <div className='flex flex-col min-h-screen'>
+    <div className='min-h-screen'>
       <Header />
-      <Outlet />
+      <Outlet/>
       <Footer />
     </div>
   )
@@ -40,6 +41,10 @@ export default function App() {
     {
       path: '/login',
       element: <LoginPage />,
+    },
+    {
+      path: '/register',
+      element: <Register />,
     },
   ])
   return (
