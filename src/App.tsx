@@ -6,6 +6,10 @@ import ContactPage from '@components/pages/contact/index.tsx'
 import BookPage from '@components/pages/book/index.tsx'
 import Home from '@components/Home/index.tsx'
 import Register from './components/pages/register'
+import { useEffect } from 'react'
+import { callFetchAccount } from '@/services/api'
+import { doGetAccountAction } from './redux/account/accountSlice'
+import { useDispatch } from 'react-redux'
 
 
 const Layout = () => {
@@ -20,6 +24,17 @@ const Layout = () => {
 
 
 export default function App() {
+  const dispatch = useDispatch()
+  const getAccount = async() => {
+    const res = await callFetchAccount()
+    if(res && res.data) {
+      dispatch(doGetAccountAction(res.data))
+    }
+  }
+
+  useEffect(() => {
+    getAccount()
+  }, [])
   const router = createBrowserRouter([
     {
       path: '/',

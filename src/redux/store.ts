@@ -3,6 +3,7 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import { counterSlice } from "./features/counter/counterSlice"
 import { quotesApiSlice } from "./features/quotes/quotesApiSlice"
+import { accountSlice } from "./account/accountSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
@@ -28,7 +29,12 @@ export const makeStore = (preloadedState?: Partial<RootState>) => {
   return store
 }
 
-export const store = makeStore()
+export const store = configureStore({
+  reducer: {
+    counter: counterSlice.reducer,
+    account: accountSlice.reducer,
+  },
+})
 
 // Infer the type of `store`
 export type AppStore = typeof store
