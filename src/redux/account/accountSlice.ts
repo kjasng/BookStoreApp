@@ -17,11 +17,12 @@ export interface AccountSliceState {
 
 const initialState: AccountSliceState = {
   isAuthenticated: false,
+  isLoading: true,
   user: {
     email: "",
     phone: "",
     fullName: "",
-    role: "guest",
+    role: "",
     avatar: "",
     id: "",
   },
@@ -31,6 +32,7 @@ const initialState: AccountSliceState = {
 export const accountSlice = createAppSlice({
   name: "account",
   initialState,
+  
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: create => ({
     doLoginAction: create.reducer((state, action) => {
@@ -38,8 +40,9 @@ export const accountSlice = createAppSlice({
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
-      state.isAuthenticated = true,
-      state.user = action.payload.user
+      state.isAuthenticated = true;
+      state.isLoading = false;
+      state.user = action.payload;
     }),
 
     doGetAccountAction: create.reducer((state, action) => {
@@ -47,13 +50,22 @@ export const accountSlice = createAppSlice({
         // doesn't actually mutate the state because it uses the Immer library,
         // which detects changes to a "draft state" and produces a brand new
         // immutable state based off those changes
-        state.isAuthenticated = true,
-        state.user = action.payload.user
+        state.isAuthenticated = true;
+        state.isLoading = false;
+        state.user = action.payload.user;
       }),
 
     doLogoutAction: create.reducer((state, action) => {
-      state.isAuthenticated = false,
-      state.user = initialState.user
+      localStorage.removeItem("access_token");
+      state.isAuthenticated = false;
+      state.user = {
+        email: "",
+        phone: "",
+        fullName: "",
+        role: "",
+        avatar: "",
+        id: "",
+      };
     }),
 
   }),
@@ -66,7 +78,7 @@ export const accountSlice = createAppSlice({
 })
 
 // Action creators are generated for each case reducer function.
-export const { doLoginAction, doGetAccountAction } =
+export const { doLoginAction, doGetAccountAction, doLogoutAction } =
   accountSlice.actions
 
 // Selectors returned by `slice.selectors` take the root state as their first argument.
