@@ -1,15 +1,11 @@
 import useMobile from "@/hook/useMobile";
 import { RootState } from "@/redux/store";
-import Icon, { AlignLeftOutlined, CloseOutlined, SearchOutlined, ShoppingCartOutlined } from "@ant-design/icons";
-import { Button, Drawer, DrawerProps, Dropdown, Input, MenuProps, message, Radio, RadioChangeEvent, Space } from "antd";
+import Icon, { AlignLeftOutlined, SearchOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { Badge, Drawer, Dropdown, Input, message, Space } from "antd";
 import Link from "antd/es/typography/Link";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-
-const IconCustom = (props) => {
-    return <Icon component={props.component} {...props} />;
-};
 
 type MenuItemType = {
     key: string;
@@ -20,9 +16,12 @@ type MenuItemType = {
 const Header = () => {
     const isMobile = useMobile();
     const navigator = useNavigate();
-    const user = useSelector((state: RootState) => state.account.user);
-    const name = user?.fullName;
-    const userRole = user?.role;
+    const user = useSelector((state: RootState) => state.account);
+    const isAuthenticated = user?.isAuthenticated;
+    const name = user?.user?.fullName;
+    const userRole = user?.user?.role;
+
+    console.log(isAuthenticated);
 
     const [open, setOpen] = useState<boolean>(false);
 
@@ -64,7 +63,6 @@ const Header = () => {
                             <AlignLeftOutlined onClick={showDrawer} />
                             <Drawer
                                 closable
-                                
                                 destroyOnClose
                                 title={<h3 className="text-xl font-semibold">Menu chức năng</h3>}
                                 placement="left"
@@ -84,15 +82,13 @@ const Header = () => {
                 )}
                 <Input placeholder="Bạn tìm gì hôm nay?" className="w-max lg:w-96" suffix={<SearchOutlined />} />
                 <div className="flex items-center justify-center gap-4 lg:gap-6">
-                    <div className="relative">
-                        <IconCustom component={ShoppingCartOutlined} className="text-xl pb-2" type="primary" />
-                        <span className="absolute top-0 -right-3 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">
-                            1
-                        </span>
-                    </div>
+                    <Space>
+                        <Badge count={5}>
+                            <ShoppingCartOutlined className="text-xl" />
+                        </Badge>
+                    </Space>
                     {isMobile > 1023 && (
-                        <Button type="primary" onClick={(e) => e.preventDefault()}>
-                            <Dropdown
+                            <Dropdown className="bg-blue-500 p-2 rounded-xl text-white hover:cursor-pointer hover:bg-blue-600 duration-300"
                                 menu={
                                     user.isAuthenticated
                                         ? {
@@ -156,11 +152,11 @@ const Header = () => {
                                     onClick={(e) => {
                                         e.preventDefault();
                                     }}
+                                    className="text-white text-md"
                                 >
                                     {name ? `Welcome ${name}` : `Welcome ${name}`}
                                 </a>
                             </Dropdown>
-                        </Button>
                     )}
                 </div>
             </div>
