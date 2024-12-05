@@ -39,7 +39,7 @@ export const accountSlice = createAppSlice({
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
       state.isAuthenticated = true,
-      state.user = action.payload
+      state.user = action.payload.user
     }),
 
     doGetAccountAction: create.reducer((state, action) => {
@@ -48,8 +48,13 @@ export const accountSlice = createAppSlice({
         // which detects changes to a "draft state" and produces a brand new
         // immutable state based off those changes
         state.isAuthenticated = true,
-        state.user = action.payload
+        state.user = action.payload.user
       }),
+
+    doLogoutAction: create.reducer((state, action) => {
+      state.isAuthenticated = false,
+      state.user = initialState.user
+    }),
 
   }),
   // You can define your selectors here. These selectors receive the slice
