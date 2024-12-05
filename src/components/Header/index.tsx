@@ -21,8 +21,6 @@ const Header = () => {
     const name = user?.user?.fullName;
     const userRole = user?.user?.role;
 
-    console.log(isAuthenticated);
-
     const [open, setOpen] = useState<boolean>(false);
 
     const showDrawer = () => {

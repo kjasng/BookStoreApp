@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 const useMobile = () => {
-    const [size, setSize] = useState(0);
+    const [size, setSize] = useState<number>(window.innerWidth);
 
     const handleResize = () => {
         window.addEventListener("resize", () => {
