@@ -22,21 +22,18 @@ type MenuItemType = {
 const Header = () => {
     const isMobile = useMobile();
     const navigator = useNavigate();
-    const user = useSelector((state: RootState) => state.account);
-    const isAuthenticated = user?.isAuthenticated;
-    const name = user?.user?.fullName;
-    const userRole = user?.user?.role;
+    const user = useSelector((state: RootState) => state.account.user);
+    const name = user?.fullName;
+    const userRole = user?.role;
     const dispatch = useDispatch();
 
     const [open, setOpen] = useState<boolean>(false);
-
     const showDrawer = () => {
         setOpen(true);
     };
 
     const handleLogout = async () => {
-        const res = await logoutRequest();
-        console.log(res);
+        await logoutRequest();
         message.success("Đăng xuất thành công");
         dispatch(doLogoutAction());
         navigator("/");
@@ -147,9 +144,9 @@ const Header = () => {
                                               ? [
                                                     {
                                                         key: "1",
-                                                        label: "Đơn hàng",
+                                                        label: "Quản lý đơn hàng",
                                                         onClick: () =>
-                                                            navigator("/order"),
+                                                            navigator("/admin"),
                                                     },
                                                     {
                                                         key: "2",

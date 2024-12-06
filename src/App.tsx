@@ -9,34 +9,13 @@ import {
 } from "@components/pages/index";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    createBrowserRouter,
-    Outlet,
-    RouterProvider,
-    useNavigate,
-} from "react-router";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router";
 import NotFound from "./components/pages/404";
 import AdminPage from "./components/pages/admin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { store } from "./redux/store";
 
-import React, { useState } from "react";
-import {
-    BookOutlined,
-    DollarOutlined,
-    FileOutlined,
-    HomeOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    TeamOutlined,
-    UserOutlined,
-} from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Breadcrumb, Button, Layout as LayoutAntd, Menu, theme } from "antd";
-import { Content } from "antd/es/layout/layout";
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
-
-type MenuItem = Required<MenuProps>["items"][number];
 
 const Layout = () => {
     return (
@@ -52,6 +31,7 @@ type RootState = ReturnType<typeof store.getState>;
 
 export default function App() {
     const dispatch = useDispatch();
+    const userRole = useSelector((state: RootState) => state.account.user?.role);
 
     const isLoading = useSelector(
         (state: RootState) => state.account.isLoading,
@@ -99,7 +79,7 @@ export default function App() {
         },
         {
             path: "/admin",
-            element: <LayoutAdmin />,
+            element: <LayoutAdmin userRole={userRole} />,
             errorElement: <NotFound />,
 
             children: [
