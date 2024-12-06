@@ -55,7 +55,6 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
 
     const [collapsed, setCollapsed] = useState(false);
     const user = useSelector((state: RootState) => state.account.user);
-    console.log(window.location.pathname);
     return (
         <p>
             {userRole === "USER" ? (

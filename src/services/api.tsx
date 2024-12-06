@@ -1,5 +1,11 @@
 import { axiosInstance as axios } from "@/utils/axios-customize";
 
+interface UpdateUser {
+    _id: string;
+    fullName: string;
+    phone: number;
+}
+
 export const callRequest = async (
     fullName: string,
     email: string,
@@ -24,4 +30,19 @@ export const logoutRequest = async () => {
 
 export const callFetchAccount = async () => {
     return axios.get("api/v1/auth/account")
+};
+
+export const getUser = async (current: number, pageSize: number) => {
+    return axios.get(`/api/v1/user?current=${current}&pageSize=${pageSize}`);
+};
+
+export const deleteUser = async (id: string) => {
+    return axios.delete(`/api/v1/user/${id}`);
+};
+
+export const updateUser = async (id: string, data: UpdateUser) => {
+    return axios.put(`/api/v1/user/`, {
+        ...data,
+        _id: id,
+    });
 };
