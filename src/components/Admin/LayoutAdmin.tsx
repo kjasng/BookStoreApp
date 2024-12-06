@@ -30,13 +30,13 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
             icon: <HomeOutlined />,
         },
         {
-            label: <Link to="/admin/user">User</Link>,
+            label: <Link to="">User</Link>,
             key: "/admin/user",
             icon: <UserOutlined />,
             children: [
                 {
-                    label: <Link to="/admin/user/crud">CRUD</Link>,
-                    key: "/admin/user/crud",
+                    label: <Link to="/admin/user">CRUD</Link>,
+                    key: "/admin/user",
                     icon: <TeamOutlined />,
                 },
             ],
@@ -53,17 +53,9 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
         },
     ];
 
-    // const items: MenuItemProps[] = [
-    //     getItem("Dashboard", "/admin", <HomeOutlined />),
-    //     getItem("User", "/admin/user", <UserOutlined />, [
-    //         getItem("CRUD", "/admin/user/crud", <TeamOutlined />),
-    //     ]),
-    //     getItem("Manage Books", "/admin/book", <BookOutlined />),
-    //     getItem("Manage Orders", "/admin/order", <DollarOutlined />),
-    // ];
-
     const [collapsed, setCollapsed] = useState(false);
     const user = useSelector((state: RootState) => state.account.user);
+    console.log(window.location.pathname);
     return (
         <p>
             {userRole === "USER" ? (
@@ -83,7 +75,7 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
                             </h1>
                             <Menu
                                 theme="light"
-                                defaultSelectedKeys={["/admin"]}
+                                defaultSelectedKeys={[window.location.pathname]}
                                 mode="inline"
                                 items={items}
                                 onSelect={(e) => navigate(e.key)}

@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { store } from "./redux/store";
 
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
+import UserPage from "./components/Admin/user";
 
 const Layout = () => {
     return (
@@ -92,8 +93,8 @@ export default function App() {
                     ),
                 },
                 {
-                    path: "contact",
-                    element: <ContactPage />,
+                    path: "user",
+                    element: <UserPage />,
                 },
                 {
                     path: "book",

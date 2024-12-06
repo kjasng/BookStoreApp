@@ -2,6 +2,16 @@
 
 A modern e-commerce platform for book enthusiasts built with React and TypeScript
 
+## Test case
+
+Guest account:
+- email: kjasnguyen.dev@gmail.com
+- password: 123456
+
+Admin account:
+- email: admin@gmail.com
+- password: 123456
+
 ## Use Case
 
 The Book Store application serves as a comprehensive platform for book enthusiasts, offering the following key functionalities:
