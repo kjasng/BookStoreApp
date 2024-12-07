@@ -1,4 +1,4 @@
-import { deleteUser, getUser, updateUser } from "@/services/api";
+import { deleteUser, getUser, searchUser, updateUser } from "@/services/api";
 import {
     Button,
     Input,
@@ -8,24 +8,38 @@ import {
     TableColumnsType,
     TableProps,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+interface DataType {
+    _id: string;
+    fullName: string;
+    email: string;
+    phone: number;
+    role: string;
+    action: string;
+}
 
-const UserTable = () => {
+interface SortType {
+    field: string;
+    order: string;
+}
+
+const UserTable = ({
+    userList,
+    setUserList,
+    query,
+    setQuery,
+}: {
+    userList: DataType[];
+    setUserList: (userList: DataType[]) => void;
+    query: string;
+    setQuery: (query: string) => void;
+}) => {
     const [modelOpen, setModelOpen] = useState<boolean>(false);
     const [data, setData] = useState<UpdateUser>({
         _id: "",
         fullName: "",
         phone: 0,
     });
-
-    interface DataType {
-        _id: string;
-        fullName: string;
-        email: string;
-        phone: number;
-        role: string;
-        action: string;
-    }
 
     interface UpdateUser {
         _id: string;
@@ -37,9 +51,7 @@ const UserTable = () => {
         {
             title: "Name",
             dataIndex: "fullName",
-            sorter: {
-                compare: (a, b) => a.fullName.localeCompare(b.fullName),
-            },
+            sorter: true,
         },
         {
             title: "Email",
@@ -49,18 +61,12 @@ const UserTable = () => {
         {
             title: "Phone",
             dataIndex: "phone",
-            sorter: {
-                compare: (a, b) => a.phone - b.phone,
-                multiple: 2,
-            },
+            sorter: true,
         },
         {
             title: "Role",
             dataIndex: "role",
-            sorter: {
-                compare: (a, b) => a.role.localeCompare(b.role),
-                multiple: 1,
-            },
+            sorter: true,
         },
         {
             title: "Action",
@@ -153,16 +159,27 @@ const UserTable = () => {
             });
     };
 
-    const [userList, setUserList] = useState<DataType[]>([]);
+    const sortUser = (value: SortType) => {
+        if (value && value.field) {
+            // const q = value.order === "ascend" ? "-" : "";
+            let q = `${query}&sort=${value.order === "ascend" ? "" : "-"}${value.field}`;
 
-    useEffect(() => {
-        getUser(1, 10).then((res) => {
-            setUserList(res.data.result);
-        });
-    }, []);
+            searchUser(1, 10, q)
+                .then((res) => {
+                    setUserList(res.data.result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
 
-    const onChange: TableProps<DataType>["onChange"] = () => {
-        return;
+    const onChange: TableProps<DataType>["onChange"] = (
+        pagination,
+        filters,
+        sorter,
+    ) => {
+        sortUser(sorter as SortType);
     };
 
     return (
@@ -170,6 +187,7 @@ const UserTable = () => {
             columns={columns}
             dataSource={userList}
             onChange={onChange}
+            className="w-full"
             pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true,

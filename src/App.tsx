@@ -32,7 +32,9 @@ type RootState = ReturnType<typeof store.getState>;
 
 export default function App() {
     const dispatch = useDispatch();
-    const userRole = useSelector((state: RootState) => state.account.user?.role);
+    const userRole = useSelector(
+        (state: RootState) => state.account.user?.role,
+    );
 
     const isLoading = useSelector(
         (state: RootState) => state.account.isLoading,
@@ -107,7 +109,7 @@ export default function App() {
         <>
             {isLoading === false ||
             window.location.pathname === "/login" ||
-            window.location.pathname === "/register" ||
+            window.location.pathname === "/register" || 
             window.location.pathname === "/" ? (
                 <RouterProvider router={router} />
             ) : (

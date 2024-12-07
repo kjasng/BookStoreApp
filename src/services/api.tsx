@@ -29,11 +29,21 @@ export const logoutRequest = async () => {
 };
 
 export const callFetchAccount = async () => {
-    return axios.get("api/v1/auth/account")
+    return axios.get("api/v1/auth/account");
 };
 
 export const getUser = async (current: number, pageSize: number) => {
     return axios.get(`/api/v1/user?current=${current}&pageSize=${pageSize}`);
+};
+
+export const searchUser = async (
+    current: number,
+    pageSize: number,
+    params: string,
+) => {
+    return axios.get(
+        `/api/v1/user?current=${current}&pageSize=${pageSize}&${params}`,
+    );
 };
 
 export const deleteUser = async (id: string) => {
