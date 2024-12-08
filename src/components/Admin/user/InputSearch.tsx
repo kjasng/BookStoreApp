@@ -17,9 +17,11 @@ interface DataType {
     phone: number;
     role: string;
     action: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
-const InputSearch = () => {
+const InputSearch = ({ showDrawer, open }: { showDrawer: () => void, open: boolean }) => {
     const [userList, setUserList] = useState<DataType[]>([]);
     const [query, setQuery] = useState("");
     const [form] = useForm();
@@ -98,6 +100,9 @@ const InputSearch = () => {
                 setUserList={setUserList}
                 query={query}
                 setQuery={setQuery}
+                showDrawer={showDrawer}
+                open={open}
+
             />
         </div>
     );

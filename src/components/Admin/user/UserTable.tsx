@@ -1,6 +1,7 @@
 import { deleteUser, getUser, searchUser, updateUser } from "@/services/api";
 import {
     Button,
+    Drawer,
     Input,
     message,
     Modal,
@@ -9,6 +10,7 @@ import {
     TableProps,
 } from "antd";
 import { useState } from "react";
+import DetailUser from "./DetailUser";
 interface DataType {
     _id: string;
     fullName: string;
@@ -16,6 +18,8 @@ interface DataType {
     phone: number;
     role: string;
     action: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface SortType {
@@ -27,7 +31,6 @@ const UserTable = ({
     userList,
     setUserList,
     query,
-    setQuery,
 }: {
     userList: DataType[];
     setUserList: (userList: DataType[]) => void;
@@ -40,6 +43,16 @@ const UserTable = ({
         fullName: "",
         phone: 0,
     });
+    const [userRecord, setUserRecord] = useState<DataType[]>([]);
+    const [open, setOpen] = useState(false);
+
+    const showDrawer = () => {
+        setOpen(true);
+    };
+
+    const onClose = () => {
+        setOpen(false);
+    };
 
     interface UpdateUser {
         _id: string;
@@ -52,6 +65,17 @@ const UserTable = ({
             title: "Name",
             dataIndex: "fullName",
             sorter: true,
+            render: (_, record) => (
+                <Button
+                    type="link"
+                    onClick={() => {
+                        showDrawer();
+                        setUserRecord(() => [record]);
+                    }}
+                >
+                    {record.fullName}
+                </Button>
+            ),
         },
         {
             title: "Email",
@@ -162,7 +186,7 @@ const UserTable = ({
     const sortUser = (value: SortType) => {
         if (value && value.field) {
             // const q = value.order === "ascend" ? "-" : "";
-            let q = `${query}&sort=${value.order === "ascend" ? "" : "-"}${value.field}`;
+            const q = `${query}&sort=${value.order === "ascend" ? "" : "-"}${value.field}`;
 
             searchUser(1, 10, q)
                 .then((res) => {
@@ -183,17 +207,29 @@ const UserTable = ({
     };
 
     return (
-        <Table
-            columns={columns}
-            dataSource={userList}
-            onChange={onChange}
-            className="w-full"
-            pagination={{
-                defaultPageSize: 10,
-                showSizeChanger: true,
-                pageSizeOptions: ["2", "5", "7"],
-            }}
-        />
+        <>
+            <Table
+                columns={columns}
+                dataSource={userList}
+                onChange={onChange}
+                className="w-full"
+                pagination={{
+                    defaultPageSize: 10,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["2", "5", "7"],
+                }}
+            />
+
+            <Drawer
+                width={640}
+                placement="right"
+                closable={true}
+                onClose={onClose}
+                open={open}
+            >
+                <DetailUser user={userRecord} />
+            </Drawer>
+        </>
     );
 };
 
