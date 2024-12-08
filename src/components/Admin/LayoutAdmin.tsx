@@ -1,27 +1,51 @@
 import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
-import { useState } from "react";
-import { Menu, Button, MenuItemProps } from "antd";
 import {
     BookOutlined,
     DollarOutlined,
+    DownOutlined,
     HomeOutlined,
-    TeamOutlined,
-    UserOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    TeamOutlined,
+    UserOutlined,
 } from "@ant-design/icons";
-import { Layout as LayoutAntd } from "antd";
+import {
+    Avatar,
+    Button,
+    Dropdown,
+    Layout as LayoutAntd,
+    Menu,
+    MenuProps,
+    message,
+    Space,
+} from "antd";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
-import { useNavigate, Outlet, Link } from "react-router";
-import { Content } from "antd/es/layout/layout";
 import useMobile from "@/hook/useMobile";
+import { Content } from "antd/es/layout/layout";
 import { ItemType } from "antd/es/menu/hooks/useItems";
+import { Link, Outlet, useNavigate } from "react-router";
 import NotFound from "../pages/404";
 
 const LayoutAdmin = ({ userRole }: { userRole: string }) => {
     const navigate = useNavigate();
     const isMobile = useMobile();
+
+    const onClick: MenuProps["onClick"] = ({ key }) => {
+        message.info(`Click on item ${key}`);
+    };
+
+    const menuItems: MenuProps["items"] = [
+        {
+            label: "Logout",
+            key: "logout",
+        },
+        {
+            label: "Profile",
+            key: "profile",
+        },
+    ];
 
     const items: ItemType[] = [
         {
@@ -55,6 +79,9 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
 
     const [collapsed, setCollapsed] = useState(false);
     const user = useSelector((state: RootState) => state.account.user);
+
+    const userAvatar = `${import.meta.env.VITE_BACKEND_API_URL}/images/avatar/${user.avatar}`;
+    console.log(userAvatar);
     return (
         <p>
             {userRole === "USER" ? (
@@ -81,7 +108,7 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
                             />
                         </LayoutAntd.Sider>
                         <LayoutAntd>
-                            <LayoutAntd.Header className="bg-[#f5f5f5] p-0">
+                            <LayoutAntd.Header className="bg-[#f5f5f5] p-0 flex justify-between items-center pr-8 py-4 h-16 border-b border-gray-200">
                                 <Button
                                     type="text"
                                     icon={
@@ -94,10 +121,27 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
                                     onClick={() => setCollapsed(!collapsed)}
                                     style={{
                                         fontSize: "16px",
-                                        width: 64,
-                                        height: 64,
+                                        width: 48,
+                                        height: 48,
                                     }}
                                 ></Button>
+
+                                <Dropdown
+                                    menu={{ items: menuItems }}
+                                    trigger={["click"]}
+                                    
+                                >
+                                    <a
+                                        onClick={(e) => e.preventDefault()}
+                                        className="h-max"
+                                    >
+                                        <Space className="flex items-center h-12">
+                                            <Avatar src={userAvatar} />
+                                            {user.fullName}
+                                            <DownOutlined />
+                                        </Space>
+                                    </a>
+                                </Dropdown>
                             </LayoutAntd.Header>
                             <Content style={{ margin: "0 16px" }}>
                                 <Outlet />

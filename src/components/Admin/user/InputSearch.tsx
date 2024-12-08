@@ -21,7 +21,13 @@ interface DataType {
     updatedAt: string;
 }
 
-const InputSearch = ({ showDrawer, open }: { showDrawer: () => void, open: boolean }) => {
+const InputSearch = ({
+    showDrawer,
+    open,
+}: {
+    showDrawer: () => void;
+    open: boolean;
+}) => {
     const [userList, setUserList] = useState<DataType[]>([]);
     const [query, setQuery] = useState("");
     const [form] = useForm();
@@ -63,12 +69,12 @@ const InputSearch = ({ showDrawer, open }: { showDrawer: () => void, open: boole
         form.resetFields();
     };
     return (
-        <div className="flex flex-col justify-center items-center w-full p-4 bg-gray-200 rounded-xl gap-4">
+        <div className="flex flex-col justify-center items-center w-full p-4 gap-4">
             <Form
                 form={form}
                 name="search-user"
                 onFinish={onFinish}
-                className="w-full flex flex-col justify-center items-center px-4"
+                className="w-full flex flex-col justify-center items-center px-4 pt-8 bg-gray-200 rounded-xl"
             >
                 <div className="flex gap-4 w-full">
                     <Form.Item name="fullName" label="Name" className="flex-1">
@@ -102,7 +108,6 @@ const InputSearch = ({ showDrawer, open }: { showDrawer: () => void, open: boole
                 setQuery={setQuery}
                 showDrawer={showDrawer}
                 open={open}
-
             />
         </div>
     );

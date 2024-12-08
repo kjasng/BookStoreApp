@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import DetailUser from "./DetailUser";
+import { ReloadOutlined } from "@ant-design/icons";
 interface DataType {
     _id: string;
     fullName: string;
@@ -206,9 +207,26 @@ const UserTable = ({
         sortUser(sorter as SortType);
     };
 
+    const renderTitle = () => {
+        return (
+            <div className="flex justify-between items-center">
+                <h1 className="text-xl font-bold">User List</h1>
+                <div className="flex gap-2">
+                    <Button type="primary">Export</Button>
+                    <Button type="primary">Import</Button>
+                    <Button type="primary">Thêm mới</Button>
+                    <Button type="ghost" className="hover:bg-gray-200 flex items-center gap-2">
+                        <ReloadOutlined />
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <>
+        <div className="w-full">
             <Table
+                title={renderTitle}
                 columns={columns}
                 dataSource={userList}
                 onChange={onChange}
@@ -229,7 +247,7 @@ const UserTable = ({
             >
                 <DetailUser user={userRecord} />
             </Drawer>
-        </>
+        </div>
     );
 };
 

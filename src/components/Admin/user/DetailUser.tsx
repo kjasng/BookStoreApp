@@ -1,7 +1,20 @@
-import { Badge, Descriptions, Table } from "antd";
+import { Badge, Descriptions } from "antd";
 import moment from "moment";
 
-const DetailUser: React.FC = ({ user }) => {
+interface UserDetail {
+    _id: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+}
+interface DetailUserProps {
+    user: UserDetail[];
+}
+
+const DetailUser: React.FC<DetailUserProps> = ({ user }) => {
     const userInfo = [
         {
             id: user[0]._id,
@@ -13,8 +26,6 @@ const DetailUser: React.FC = ({ user }) => {
             updatedAt: user[0].updatedAt,
         },
     ];
-
-    console.log(user[0]._id);
     return (
         <Descriptions title="User Info" bordered layout="vertical" column={2}>
             <Descriptions.Item label="ID">{userInfo[0].id}</Descriptions.Item>

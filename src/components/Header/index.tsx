@@ -7,8 +7,9 @@ import Icon, {
     SearchOutlined,
     ShoppingCartOutlined,
 } from "@ant-design/icons";
-import { Badge, Drawer, Dropdown, Input, message, Space } from "antd";
+import { Avatar, Badge, Drawer, Dropdown, Input, message, Space } from "antd";
 import Link from "antd/es/typography/Link";
+import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -26,6 +27,13 @@ const Header = () => {
     const name = user?.fullName;
     const userRole = user?.role;
     const dispatch = useDispatch();
+    let userAvatar = "";
+    if (user?.avatar.length > 0) {
+        console.log(userAvatar.length);
+
+        userAvatar = `${import.meta.env.VITE_BACKEND_API_URL}/images/avatar/${user?.avatar}`;
+        console.log(userAvatar.length);
+    }
 
     const [open, setOpen] = useState<boolean>(false);
     const showDrawer = () => {
@@ -53,6 +61,7 @@ const Header = () => {
             onClick: handleLogout,
         },
     ];
+
     return (
         <div className="h-16 bg-gradient-to-r from-amber-100 to-purple-300 flex justify-center items-center">
             <div className="flex justify-between items-center w-full px-6 xl:px-56 gap-2">
@@ -177,8 +186,11 @@ const Header = () => {
                                 onClick={(e) => {
                                     e.preventDefault();
                                 }}
-                                className="text-white text-md"
+                                className="text-white text-sm flex items-center gap-2"
                             >
+                                {userAvatar.length > 0 ? (
+                                    <Avatar src={userAvatar} size={24} />
+                                ) : null}
                                 {name ? `Welcome ${name}` : `Welcome ${name}`}
                             </a>
                         </Dropdown>
