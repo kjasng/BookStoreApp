@@ -12,6 +12,8 @@ import {
 import { useState } from "react";
 import DetailUser from "./DetailUser";
 import { ReloadOutlined } from "@ant-design/icons";
+import AddNewUser from "./AddNewUser";
+import ModalUpload from "./ModalUpload";
 interface DataType {
     _id: string;
     fullName: string;
@@ -36,7 +38,6 @@ const UserTable = ({
     userList: DataType[];
     setUserList: (userList: DataType[]) => void;
     query: string;
-    setQuery: (query: string) => void;
 }) => {
     const [modelOpen, setModelOpen] = useState<boolean>(false);
     const [data, setData] = useState<UpdateUser>({
@@ -46,6 +47,16 @@ const UserTable = ({
     });
     const [userRecord, setUserRecord] = useState<DataType[]>([]);
     const [open, setOpen] = useState(false);
+    const [openBox, setOpenBox] = useState(false);
+    const [openModalUpload, setOpenModalUpload] = useState(false);
+
+    const openBoxDrawer = () => {
+        setOpenBox(true);
+    };
+
+    const closeBoxDrawer = () => {
+        setOpenBox(false);
+    };
 
     const showDrawer = () => {
         setOpen(true);
@@ -213,9 +224,16 @@ const UserTable = ({
                 <h1 className="text-xl font-bold">User List</h1>
                 <div className="flex gap-2">
                     <Button type="primary">Export</Button>
-                    <Button type="primary">Import</Button>
-                    <Button type="primary">Thêm mới</Button>
-                    <Button type="ghost" className="hover:bg-gray-200 flex items-center gap-2">
+                    <Button type="primary" onClick={() => setOpenModalUpload(true)}>
+                        Import
+                    </Button>
+                    <Button type="primary" onClick={openBoxDrawer}>
+                        Thêm mới
+                    </Button>
+                    <Button
+                        type="ghost"
+                        className="hover:bg-gray-200 flex items-center gap-2"
+                    >
                         <ReloadOutlined />
                     </Button>
                 </div>
@@ -235,6 +253,8 @@ const UserTable = ({
                     defaultPageSize: 10,
                     showSizeChanger: true,
                     pageSizeOptions: ["2", "5", "7"],
+                    showTotal: (total, range) =>
+                        `${range[0]}-${range[1]} trên ${total} rows`,
                 }}
             />
 
@@ -247,6 +267,18 @@ const UserTable = ({
             >
                 <DetailUser user={userRecord} />
             </Drawer>
+
+            <Drawer
+                width={640}
+                placement="right"
+                closable={true}
+                onClose={closeBoxDrawer}
+                open={openBox}
+            >
+                <AddNewUser />
+            </Drawer>
+
+            {openModalUpload && <ModalUpload open={openModalUpload} setOpen={setOpenModalUpload}/>}
         </div>
     );
 };

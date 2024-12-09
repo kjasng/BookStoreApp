@@ -21,13 +21,7 @@ interface DataType {
     updatedAt: string;
 }
 
-const InputSearch = ({
-    showDrawer,
-    open,
-}: {
-    showDrawer: () => void;
-    open: boolean;
-}) => {
+const InputSearch = () => {
     const [userList, setUserList] = useState<DataType[]>([]);
     const [query, setQuery] = useState("");
     const [form] = useForm();
@@ -105,9 +99,6 @@ const InputSearch = ({
                 userList={userList}
                 setUserList={setUserList}
                 query={query}
-                setQuery={setQuery}
-                showDrawer={showDrawer}
-                open={open}
             />
         </div>
     );

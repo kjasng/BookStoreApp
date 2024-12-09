@@ -6,6 +6,11 @@ interface UpdateUser {
     phone: number;
 }
 
+interface AddNewUser {
+    fullName: string;
+    email: string;
+    phone: number;
+}
 export const callRequest = async (
     fullName: string,
     email: string,
@@ -55,4 +60,8 @@ export const updateUser = async (id: string, data: UpdateUser) => {
         ...data,
         _id: id,
     });
+};
+
+export const AddNewUserApi = async (data: AddNewUser) => {
+    return axios.post("/api/v1/user", data);
 };
