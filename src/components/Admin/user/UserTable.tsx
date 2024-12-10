@@ -2,9 +2,12 @@ import { deleteUser, getUser, searchUser, updateUser } from "@/services/api";
 import {
     Button,
     Drawer,
+    Form,
     Input,
     message,
     Modal,
+    Popover,
+    Space,
     Table,
     TableColumnsType,
     TableProps,
@@ -13,7 +16,8 @@ import { useState } from "react";
 import DetailUser from "./DetailUser";
 import { ReloadOutlined } from "@ant-design/icons";
 import AddNewUser from "./AddNewUser";
-import ModalUpload from "./ModalUpload";
+import ModalUpload from "./data/ModalUpload";
+import * as XLSX from "xlsx";
 interface DataType {
     _id: string;
     fullName: string;
@@ -42,6 +46,7 @@ const UserTable = ({
     const [modelOpen, setModelOpen] = useState<boolean>(false);
     const [data, setData] = useState<UpdateUser>({
         _id: "",
+        email: "",
         fullName: "",
         phone: 0,
     });
@@ -49,7 +54,20 @@ const UserTable = ({
     const [open, setOpen] = useState(false);
     const [openBox, setOpenBox] = useState(false);
     const [openModalUpload, setOpenModalUpload] = useState(false);
-
+    const [form] = Form.useForm();
+    const content = (
+        <>
+            <div>Are you sure to delete this user?</div>
+            <div className="flex gap-2">
+                <Button type="primary" onClick={() => handleDelete(data)}>
+                    Delete
+                </Button>
+                <Button type="primary" onClick={() => setModelOpen(false)} className="bg-white text-black border border-gray-300 hover:bg-gray-200">
+                    Cancel
+                </Button>
+            </div>
+        </>
+    );
     const openBoxDrawer = () => {
         setOpenBox(true);
     };
@@ -68,6 +86,7 @@ const UserTable = ({
 
     interface UpdateUser {
         _id: string;
+        email: string;
         fullName: string;
         phone: number;
     }
@@ -109,18 +128,28 @@ const UserTable = ({
             dataIndex: "action",
             render: (_, record) => (
                 <div className="flex gap-2">
-                    <Button
-                        type="ghost"
-                        onClick={() => handleDelete(record)}
-                        className="bg-red-500 text-white border-none hover:bg-red-800/80 hover:text-white"
-                    >
-                        Delete
-                    </Button>
+                    <Space>
+                        <Popover
+                            content={content}
+                            title="Delete user"
+                            trigger="click"
+                            placement="left"
+                        >
+                            <Button
+                                type="ghost"
+                                className="bg-red-500 text-white border-none hover:bg-red-800/80 hover:text-white"
+                                // onClick={() => handleDelete(record)}
+                            >
+                                Delete
+                            </Button>
+                        </Popover>
+                    </Space>
                     <Button
                         type="ghost"
                         onClick={() => {
                             setData({
                                 _id: record._id,
+                                email: record.email,
                                 fullName: record.fullName,
                                 phone: record.phone,
                             });
@@ -130,40 +159,62 @@ const UserTable = ({
                     >
                         Edit
                     </Button>
-
                     <Modal
-                        title={`Edit user "${record.fullName}"`}
+                        // title={`Edit user "${record.fullName}"`}
+                        title={`Edit user ${data.fullName}`}
                         centered
                         open={modelOpen}
                         onOk={() => handleEdit(data)}
                         onCancel={() => setModelOpen(false)}
                     >
-                        <div className="flex flex-col gap-4 my-4">
-                            <div className="flex flex-col gap-2">
-                                <h3>Full name</h3>
-                                <Input
-                                    placeholder="Full name"
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            fullName: e.target.value,
-                                        })
-                                    }
-                                />
+                        <Form
+                            form={form}
+                            name="edit-user"
+                            layout="vertical"
+                            onFinish={() => handleEdit(data)}
+                            autoComplete="off"
+                        >
+                            <div className="flex flex-col gap-4 my-4">
+                                <div className="flex flex-col gap-2">
+                                    <h3>Full name</h3>
+                                    <Input
+                                        placeholder="Full name"
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                fullName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <h3>Email</h3>
+                                    <Input
+                                        placeholder="Email"
+                                        disabled
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                email: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <h3>Phone</h3>
+                                    <Input
+                                        placeholder="Phone"
+                                        onChange={(e) =>
+                                            setData({
+                                                ...data,
+                                                phone: Number(e.target.value),
+                                            })
+                                        }
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-2">
-                                <h3>Phone</h3>
-                                <Input
-                                    placeholder="Phone"
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            phone: Number(e.target.value),
-                                        })
-                                    }
-                                />
-                            </div>
-                        </div>
+                        </Form>
                     </Modal>
                 </div>
             ),
@@ -218,13 +269,27 @@ const UserTable = ({
         sortUser(sorter as SortType);
     };
 
+    const handleExport = () => {
+        if (userList.length > 0) {
+            const worksheet = XLSX.utils.json_to_sheet(userList);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+            XLSX.writeFile(workbook, "user.xlsx", { compression: true });
+        }
+    };
+
     const renderTitle = () => {
         return (
             <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold">User List</h1>
                 <div className="flex gap-2">
-                    <Button type="primary">Export</Button>
-                    <Button type="primary" onClick={() => setOpenModalUpload(true)}>
+                    <Button type="primary" onClick={handleExport}>
+                        Export
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={() => setOpenModalUpload(true)}
+                    >
                         Import
                     </Button>
                     <Button type="primary" onClick={openBoxDrawer}>
@@ -278,7 +343,12 @@ const UserTable = ({
                 <AddNewUser />
             </Drawer>
 
-            {openModalUpload && <ModalUpload open={openModalUpload} setOpen={setOpenModalUpload}/>}
+            {openModalUpload && (
+                <ModalUpload
+                    open={openModalUpload}
+                    setOpen={setOpenModalUpload}
+                />
+            )}
         </div>
     );
 };

@@ -3,6 +3,7 @@ import { message, Modal, Table, UploadProps } from "antd";
 import Dragger from "antd/es/upload/Dragger";
 import { useState } from "react";
 import { read, utils } from "xlsx";
+import templateFile from "./user.xlsx?url"
 
 const dummyRequest = async ({ file, onSuccess }) => {
     setTimeout(() => {
@@ -81,7 +82,6 @@ const ModalUpload = ({
                         e.target?.result as ArrayBuffer,
                     );
                     const workbook = read(data, { type: "array" });
-                    // find the name of your sheet in the workbook first
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
                     // convert to json format
@@ -108,7 +108,7 @@ const ModalUpload = ({
     };
 
     return (
-        <Modal open={open} onCancel={onCancel} title="Import data user">
+        <Modal open={open} onCancel={onCancel} title="Import data user" maskClosable={false}>
             <div className="flex flex-col gap-4 w-full">
                 <Dragger accept=".csv, .xls, .xlsx" className="px-4" {...props}>
                     <p className="ant-upload-drag-icon">
@@ -119,7 +119,7 @@ const ModalUpload = ({
                     </p>
                     <p className="ant-upload-hint">
                         Support for a single upload. Only accept .csv, .xls,
-                        .xlsx
+                        .xlsx &nbsp; <a className="text-blue-500" onClick={(e) => e.stopPropagation()} href={templateFile}>Download template</a>
                     </p>
                 </Dragger>
 
