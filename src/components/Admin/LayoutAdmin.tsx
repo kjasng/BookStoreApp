@@ -81,7 +81,6 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
     const user = useSelector((state: RootState) => state.account.user);
 
     const userAvatar = `${import.meta.env.VITE_BACKEND_API_URL}/images/avatar/${user.avatar}`;
-    console.log(userAvatar);
     return (
         <p>
             {userRole === "USER" ? (
@@ -129,7 +128,6 @@ const LayoutAdmin = ({ userRole }: { userRole: string }) => {
                                 <Dropdown
                                     menu={{ items: menuItems }}
                                     trigger={["click"]}
-                                    
                                 >
                                     <a
                                         onClick={(e) => e.preventDefault()}

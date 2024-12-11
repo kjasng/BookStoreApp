@@ -65,3 +65,17 @@ export const updateUser = async (id: string, data: UpdateUser) => {
 export const AddNewUserApi = async (data: AddNewUser) => {
     return axios.post("/api/v1/user", data);
 };
+
+export const getBookList = async (current: number, pageSize: number) => {
+    return axios.get(`api/v1/book?current=${current}&pageSize=${pageSize}`);
+};
+
+export const searchBook = async (
+    current: number,
+    pageSize: number,
+    value: string,
+) => {
+    return axios.get(
+        `api/v1/book?current=${current}&pageSize=${pageSize}&${value}`,
+    );
+};

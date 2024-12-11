@@ -17,6 +17,7 @@ import { store } from "./redux/store";
 
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
 import UserPage from "./components/Admin/user";
+import AdminBook from "./components/Admin/book";
 
 const Layout = () => {
     return (
@@ -100,7 +101,7 @@ export default function App() {
                 },
                 {
                     path: "book",
-                    element: <BookPage />,
+                    element: <AdminBook />,
                 },
             ],
         },
