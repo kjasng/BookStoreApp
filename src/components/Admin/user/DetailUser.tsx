@@ -1,17 +1,18 @@
 import { Badge, Descriptions } from "antd";
 import moment from "moment";
+interface DetailUserProps {
+    user: DataType[];
+}
 
-interface UserDetail {
+interface DataType {
     _id: string;
     fullName: string;
     email: string;
-    phone: string;
+    phone: number;
     role: string;
+    action: string;
     createdAt: string;
     updatedAt: string;
-}
-interface DetailUserProps {
-    user: UserDetail[];
 }
 
 const DetailUser: React.FC<DetailUserProps> = ({ user }) => {

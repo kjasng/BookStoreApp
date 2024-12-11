@@ -1,4 +1,5 @@
 import { deleteUser, getUser, searchUser, updateUser } from "@/services/api";
+import { ReloadOutlined } from "@ant-design/icons";
 import {
     Button,
     Drawer,
@@ -13,11 +14,10 @@ import {
     TableProps,
 } from "antd";
 import { useState } from "react";
-import DetailUser from "./DetailUser";
-import { ReloadOutlined } from "@ant-design/icons";
+import * as XLSX from "xlsx";
 import AddNewUser from "./AddNewUser";
 import ModalUpload from "./data/ModalUpload";
-import * as XLSX from "xlsx";
+import DetailUser from "./DetailUser";
 interface DataType {
     _id: string;
     fullName: string;
@@ -221,7 +221,7 @@ const UserTable = ({
         },
     ];
 
-    const handleDelete = async (record: DataType) => {
+    const handleDelete = async (record: UpdateUser) => {
         await deleteUser(record._id).then(() => {
             message.success("Delete user successfully");
 
