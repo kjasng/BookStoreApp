@@ -23,7 +23,8 @@
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"]
+      "@components/*": ["./src/components/*"],
+      "@admin/*": ["./src/components/Admin/*"],
     }
   },
   "include": ["src"]
