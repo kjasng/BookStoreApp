@@ -62,7 +62,11 @@ const UserTable = ({
                 <Button type="primary" onClick={() => handleDelete(data)}>
                     Delete
                 </Button>
-                <Button type="primary" onClick={() => setModelOpen(false)} className="bg-white text-black border border-gray-300 hover:bg-gray-200">
+                <Button
+                    type="primary"
+                    onClick={() => setModelOpen(false)}
+                    className="bg-white text-black border border-gray-300 hover:bg-gray-200"
+                >
                     Cancel
                 </Button>
             </div>

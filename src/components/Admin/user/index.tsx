@@ -3,7 +3,7 @@ import InputSearch from "./InputSearch";
 const UserPage = () => {
     return (
         <div className="flex flex-col gap-4">
-            <InputSearch  />
+            <InputSearch />
         </div>
     );
 };

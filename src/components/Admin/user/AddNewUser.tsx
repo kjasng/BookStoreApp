@@ -43,7 +43,11 @@ const AddNewUser = () => {
                 label="Email"
                 name="email"
                 rules={[
-                    { required: true, type: "email", message: validateMessages.types.email },
+                    {
+                        required: true,
+                        type: "email",
+                        message: validateMessages.types.email,
+                    },
                 ]}
             >
                 <Input />
