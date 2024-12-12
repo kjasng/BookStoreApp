@@ -66,8 +66,14 @@ export const AddNewUserApi = async (data: AddNewUser) => {
     return axios.post("/api/v1/user", data);
 };
 
-export const getBookList = async (current: number, pageSize: number) => {
-    return axios.get(`api/v1/book?current=${current}&pageSize=${pageSize}`);
+export const getBookList = async (
+    current: number,
+    pageSize: number,
+    sorter: string,
+) => {
+    return axios.get(
+        `api/v1/book?current=${current}&pageSize=${pageSize}${sorter}`,
+    );
 };
 
 export const searchBook = async (
@@ -78,4 +84,8 @@ export const searchBook = async (
     return axios.get(
         `api/v1/book?current=${current}&pageSize=${pageSize}&${value}`,
     );
+};
+
+export const callFetchCategory = async () => {
+    return axios.get("/api/v1/database/category");
 };
