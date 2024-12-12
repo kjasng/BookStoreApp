@@ -1,7 +1,7 @@
 import { getBookList, searchBook } from "@/services/api";
 import { Button, Form, Input, Space, message } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BookDetail from "./BookDetail";
 
 interface InputSearch {
@@ -12,11 +12,14 @@ interface InputSearch {
 
 interface DataType {
     _id: string;
-    name: string;
+    mainText: string;
     category: string;
     author: string;
     price: number;
-    action: string;
+    thumbnail: string;
+    slider: string[];
+    quantity: number;
+    sold: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -25,8 +28,9 @@ const InputSearch = () => {
     // const [query, setQuery] = useState("");
     const [bookList, setBookList] = useState<DataType[]>([]);
     const [form] = useForm();
+    let query = "";
+
     const onFinish = async (values: InputSearch) => {
-        let query = "";
         if (values.mainText || values.author || values.category) {
             if (values.mainText) {
                 query += `mainText=/${values.mainText}/i&`;
@@ -50,21 +54,16 @@ const InputSearch = () => {
                 });
         } else {
             message.warning("Please enter at least one field");
-            getBookList(1, 10).then((res) => {
+            getBookList(1, 10, "").then((res) => {
                 setBookList(res.data.result);
             });
         }
     };
 
-    useEffect(() => {
-        getBookList(1, 10).then((res) => {
-            setBookList(res.data.result);
-        });
-    }, []);
-
     const onReset = () => {
         form.resetFields();
     };
+
     return (
         <div className="flex flex-col justify-center items-center w-full p-4 gap-4">
             <Form
@@ -106,7 +105,11 @@ const InputSearch = () => {
                 </div>
             </Form>
 
-            <BookDetail bookList={bookList} setBookList={setBookList} />
+            <BookDetail
+                bookList={bookList}
+                setBookList={setBookList}
+                query={query}
+            />
         </div>
     );
 };
