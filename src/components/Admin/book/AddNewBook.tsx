@@ -63,16 +63,27 @@ const beforeUpload = (file: FileType) => {
     return isJpgOrPng && isLt2M;
 };
 
-const AddNewBook = ({ categoryList }: { categoryList: BookCategory[] }) => {
+const AddNewBook = ({
+    categoryList,
+    isModalOpen,
+    handleOk,
+    setIsModalOpen,
+}: {
+    categoryList: BookCategory[];
+    isModalOpen: boolean;
+    handleOk: () => void;
+    setIsModalOpen: (value: boolean) => void;
+}) => {
     const [loadingSlider, setLoadingSlider] = useState(false);
     const [loadingThumbnail, setLoadingThumbnail] = useState(false);
     const [dataSlider, setDataSlider] = useState<ImageType[]>([]);
-    const [imageUrl, setImageUrl] = useState("");
+    const [imageUrl, setImageUrl] = useState(""); // eslint-disable-line
     const [dataThumbnail, setDataThumbnail] = useState<ImageType[]>([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewTitle, setPreviewTitle] = useState<string | undefined>(
         undefined,
     );
+    const [form] = Form.useForm();
 
     const [previewImage, setPreviewImage] = useState<string | undefined>(
         undefined,
@@ -90,6 +101,10 @@ const AddNewBook = ({ categoryList }: { categoryList: BookCategory[] }) => {
         console.log("Failed:", errorInfo);
     };
 
+    const handleCancel = () => {
+        form.resetFields();
+        setIsModalOpen(false);
+    };
     const handlePreview = async (file: UploadFile) => {
         getBase64(file.originFileObj as Blob, (url: string) => {
             setPreviewImage(url);
@@ -176,164 +191,187 @@ const AddNewBook = ({ categoryList }: { categoryList: BookCategory[] }) => {
     };
 
     return (
-        <Form
-            name="basic"
-            labelCol={{ span: 32 }}
-            wrapperCol={{ span: 30 }}
-            style={{ maxWidth: 720 }}
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            autoComplete="off"
-            className="flex flex-col gap-4 items-end"
-            layout="vertical"
+        <Modal
+            title="Thêm mới sách"
+            open={isModalOpen}
+            centered
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={null}
+            width={720}
         >
-            <div className="flex w-full flex-wrap gap-2">
-                <Form.Item<FieldType>
-                    label="Tên sách"
-                    name="mainText"
-                    required
-                    className="w-[calc(50%-10px)]"
-                >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item<FieldType>
-                    label="Tác giả"
-                    name="author"
-                    className="w-[calc(50%-10px)]"
-                    required
-                >
-                    <Input />
-                </Form.Item>
-
-                <div className="flex w-[calc(50%-4px)] gap-4">
-                    <Form.Item
-                        label="Giá tiền"
-                        name="price"
-                        required
-                        className="w-[calc(50%-12px)]"
-                    >
-                        <InputNumber
-                            addonAfter="VND"
-                            min={0}
-                            formatter={(value) =>
-                                String(value).replace(
-                                    /\B(?=(\d{3})+(?!\d))/g,
-                                    ",",
-                                )
-                            }
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        label="Thể loại"
-                        name="category"
-                        required
-                        className="w-[calc(50%-12px)]"
-                    >
-                        <Select
-                            options={categoryList}
-                            className="w-1/2"
-                        ></Select>
-                    </Form.Item>
-                </div>
-                <div className="flex w-[calc(50%-4px)] gap-4">
-                    <Form.Item
-                        label="Số lượng"
-                        name="quantity"
-                        required
-                        className="w-1/2"
-                    >
-                        <InputNumber addonAfter="VND" min={0} />
-                    </Form.Item>
-                    <Form.Item
-                        label="Đã bán"
-                        name="sold"
-                        required
-                        className="w-1/2"
-                    >
-                        <InputNumber className="w-[calc(100%-10px)]" min={0} />
-                    </Form.Item>
-                </div>
-            </div>
-            <div className="flex w-full ">
-                <div className="w-1/2 gap-4 flex flex-col">
-                    <h1>Ảnh thumbnail</h1>
-                    <Form.Item name="thumbnail">
-                        <Upload
-                            listType="picture-card"
-                            multiple={false}
-                            onChange={(info: UploadChangeParam<UploadFile>) =>
-                                handleChange(info)
-                            }
-                            beforeUpload={beforeUpload}
-                            maxCount={1}
-                            onPreview={handlePreview}
-                            onRemove={(file) => handleRemove(file, "thumbnail")}
-                            customRequest={handleUploadThumbnail}
-                        >
-                            <button
-                                style={{ border: 0, background: "none" }}
-                                type="button"
-                            >
-                                {loadingThumbnail ? (
-                                    <LoadingOutlined />
-                                ) : (
-                                    <PlusOutlined />
-                                )}
-                                <div style={{ marginTop: 8 }}>Upload</div>
-                            </button>
-                        </Upload>
-                    </Form.Item>
-                </div>
-                <div className="w-1/2 gap-4 flex flex-col">
-                    <h1>Ảnh slider</h1>
-                    <Form.Item name="slider">
-                        <Upload
-                            listType="picture-card"
-                            multiple={true}
-                            className="w-full"
-                            onChange={(info) => handleChange(info, "slider")}
-                            beforeUpload={beforeUpload}
-                            onPreview={handlePreview}
-                            onRemove={(file) => handleRemove(file, "slider")}
-                            customRequest={handleUploadSlider}
-                        >
-                            <button
-                                style={{ border: 0, background: "none" }}
-                                type="button"
-                            >
-                                {loadingSlider ? (
-                                    <LoadingOutlined />
-                                ) : (
-                                    <PlusOutlined />
-                                )}
-                                <div style={{ marginTop: 8 }}>Upload</div>
-                            </button>
-                        </Upload>
-                    </Form.Item>
-                </div>
-            </div>
-            <Modal
-                open={previewOpen}
-                title={previewTitle}
-                footer={null}
-                centered
-                onCancel={() => setPreviewOpen(false)}
+            <Form
+                name="basic"
+                labelCol={{ span: 32 }}
+                wrapperCol={{ span: 30 }}
+                style={{ maxWidth: 720 }}
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete="off"
+                className="flex flex-col gap-4 items-end"
+                layout="vertical"
+                form={form}
             >
-                <img
-                    alt="example"
-                    style={{ width: "100%" }}
-                    src={previewImage}
-                />
-            </Modal>
+                <div className="flex w-full flex-wrap gap-2">
+                    <Form.Item<FieldType>
+                        label="Tên sách"
+                        name="mainText"
+                        required
+                        className="w-[calc(50%-10px)]"
+                    >
+                        <Input />
+                    </Form.Item>
 
-            <Form.Item label={null}>
-                <Button type="primary" htmlType="submit">
-                    Submit
-                </Button>
-            </Form.Item>
-        </Form>
+                    <Form.Item<FieldType>
+                        label="Tác giả"
+                        name="author"
+                        className="w-[calc(50%-10px)]"
+                        required
+                    >
+                        <Input />
+                    </Form.Item>
+
+                    <div className="flex w-[calc(50%-4px)] gap-4">
+                        <Form.Item
+                            label="Giá tiền"
+                            name="price"
+                            required
+                            className="w-[calc(50%-12px)]"
+                        >
+                            <InputNumber
+                                addonAfter="VND"
+                                min={0}
+                                formatter={(value) =>
+                                    String(value).replace(
+                                        /\B(?=(\d{3})+(?!\d))/g,
+                                        ",",
+                                    )
+                                }
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            label="Thể loại"
+                            name="category"
+                            required
+                            className="w-[calc(50%-12px)]"
+                        >
+                            <Select
+                                options={categoryList}
+                                className="w-1/2"
+                            ></Select>
+                        </Form.Item>
+                    </div>
+                    <div className="flex w-[calc(50%-4px)] gap-4">
+                        <Form.Item
+                            label="Số lượng"
+                            name="quantity"
+                            required
+                            className="w-1/2"
+                        >
+                            <InputNumber addonAfter="VND" min={0} />
+                        </Form.Item>
+                        <Form.Item
+                            label="Đã bán"
+                            name="sold"
+                            required
+                            className="w-1/2"
+                        >
+                            <InputNumber
+                                className="w-[calc(100%-10px)]"
+                                min={0}
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
+                <div className="flex w-full ">
+                    <div className="w-1/2 gap-4 flex flex-col">
+                        <h1>Ảnh thumbnail</h1>
+                        <Form.Item name="thumbnail">
+                            <Upload
+                                listType="picture-card"
+                                multiple={false}
+                                onChange={(
+                                    info: UploadChangeParam<UploadFile>,
+                                ) => handleChange(info)}
+                                beforeUpload={beforeUpload}
+                                maxCount={1}
+                                onPreview={handlePreview}
+                                onRemove={(file) =>
+                                    handleRemove(file, "thumbnail")
+                                }
+                                // @ts-expect-error: ignore error
+                                customRequest={handleUploadThumbnail}
+                            >
+                                <button
+                                    style={{ border: 0, background: "none" }}
+                                    type="button"
+                                >
+                                    {loadingThumbnail ? (
+                                        <LoadingOutlined />
+                                    ) : (
+                                        <PlusOutlined />
+                                    )}
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </button>
+                            </Upload>
+                        </Form.Item>
+                    </div>
+                    <div className="w-1/2 gap-4 flex flex-col">
+                        <h1>Ảnh slider</h1>
+                        <Form.Item name="slider">
+                            <Upload
+                                listType="picture-card"
+                                multiple={true}
+                                className="w-full"
+                                onChange={(info) =>
+                                    handleChange(info, "slider")
+                                }
+                                beforeUpload={beforeUpload}
+                                onPreview={handlePreview}
+                                onRemove={(file) =>
+                                    handleRemove(file, "slider")
+                                }
+                                // @ts-expect-error: ignore error
+
+                                customRequest={handleUploadSlider}
+                            >
+                                <button
+                                    style={{ border: 0, background: "none" }}
+                                    type="button"
+                                >
+                                    {loadingSlider ? (
+                                        <LoadingOutlined />
+                                    ) : (
+                                        <PlusOutlined />
+                                    )}
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </button>
+                            </Upload>
+                        </Form.Item>
+                    </div>
+                </div>
+                <Modal
+                    open={previewOpen}
+                    title={previewTitle}
+                    footer={null}
+                    centered
+                    onCancel={() => setPreviewOpen(false)}
+                >
+                    <img
+                        alt="example"
+                        style={{ width: "100%" }}
+                        src={previewImage}
+                    />
+                </Modal>
+
+                <Form.Item label={null}>
+                    <Button type="primary" htmlType="submit">
+                        Submit
+                    </Button>
+                </Form.Item>
+            </Form>
+        </Modal>
     );
 };
 

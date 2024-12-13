@@ -10,11 +10,10 @@ import {
     Descriptions,
     Drawer,
     Image,
-    Modal,
     Table,
     TableColumnsType,
     TableProps,
-    Upload,
+    Upload
 } from "antd";
 import { v4 as uuidv4 } from "uuid";
 
@@ -73,7 +72,6 @@ const BookDetail = ({
     const [previewImage, setPreviewImage] = useState(""); //eslint-disable-line
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [categoryList, setCategoryList] = useState<BookCategory[]>([]);
-    // const imageUrl = `${import.meta.env.VITE_API_URL}/image/book/`;
 
     const handlePreview = async (file: UploadFile) => {
         if (!file.url && !file.preview) {
@@ -103,9 +101,7 @@ const BookDetail = ({
         setIsModalOpen(false);
     };
 
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
+    
 
     useEffect(() => {
         if (bookDetail) {
@@ -370,17 +366,12 @@ const BookDetail = ({
                 </>
             )}
 
-            <Modal
-                title="Thêm mới sách"
-                open={isModalOpen}
-                centered
-                onOk={handleOk}
-                onCancel={handleCancel}
-                footer={null}
-                width={720}
-            >
-                <AddNewBook categoryList={categoryList} />
-            </Modal>
+            <AddNewBook
+                categoryList={categoryList}
+                isModalOpen={isModalOpen}
+                handleOk={handleOk}
+                setIsModalOpen={setIsModalOpen}
+            />
         </div>
     );
 };
