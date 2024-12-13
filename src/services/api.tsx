@@ -11,6 +11,7 @@ interface AddNewUser {
     email: string;
     phone: number;
 }
+
 export const callRequest = async (
     fullName: string,
     email: string,
@@ -88,4 +89,18 @@ export const searchBook = async (
 
 export const callFetchCategory = async () => {
     return axios.get("/api/v1/database/category");
+};
+
+export const callUploadBookImg = (fileImg: File) => {
+    const bodyFormData = new FormData();
+    bodyFormData.append("fileImg", fileImg);
+    return axios({
+        method: "POST",
+        url: "/api/v1/file/upload",
+        data: bodyFormData,
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "upload-type": "book",
+        },
+    });
 };
