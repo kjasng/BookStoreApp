@@ -11,6 +11,7 @@ import {
   Row,
   Select,
   Upload,
+  UploadFile,
 } from 'antd'
 import {
   addNewBook,
@@ -19,10 +20,57 @@ import {
 } from '../../../services/api'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import { v4 as uuidv4 } from 'uuid'
+import { UploadChangeParam } from 'antd/es/upload'
 
-const BookModalUpdate = (props: any) => {
-  const { openModalUpdate, setOpenModalUpdate, dataUpdate, setDataUpdate } =
-    props
+interface IDataUpdate {
+  _id: string
+  mainText: string
+  author: string
+  price: number
+  category: string
+  quantity: number
+  sold: number
+  thumbnail: string
+  slider: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+interface BookCategory {
+  value: string
+  label: string
+}
+
+interface IBookModalUpload {
+  open: boolean
+  setOpen: (open: boolean) => void
+  dataUpdate: IDataUpdate | null
+  setDataUpdate: (data: IDataUpdate | null) => void
+  fetchBook: () => void
+  categoryList: BookCategory[]
+}
+
+interface DataSlider {
+  uid: string
+  name: string
+  status: string
+  url: string
+}
+
+interface InitData {
+  _id: string
+  mainText: string
+  author: string
+  price: number
+  category: string
+  quantity: number
+  sold: number
+  thumbnail: { fileList: DataSlider[] }
+  slider: { fileList: DataSlider[] }
+}
+
+const BookModalUpdate = (props: IBookModalUpload) => {
+  const { open, setOpen, dataUpdate, setDataUpdate } = props
   const [isSubmit, setIsSubmit] = useState(false)
 
   const [listCategory, setListCategory] = useState([])
@@ -31,16 +79,16 @@ const BookModalUpdate = (props: any) => {
   const [loading, setLoading] = useState(false)
   const [loadingSlider, setLoadingSlider] = useState(false)
 
-  const [imageUrl, setImageUrl] = useState('')
+  const [imageUrl, setImageUrl] = useState('') // eslint-disable-line
 
-  const [dataThumbnail, setDataThumbnail] = useState([])
-  const [dataSlider, setDataSlider] = useState([])
+  const [dataThumbnail, setDataThumbnail] = useState<DataSlider[]>([])
+  const [dataSlider, setDataSlider] = useState<DataSlider[]>([])
 
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
   const [previewTitle, setPreviewTitle] = useState('')
 
-  const [initForm, setInitForm] = useState<any>(null)
+  const [initForm, setInitForm] = useState<InitData | null>(null)
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -57,21 +105,26 @@ const BookModalUpdate = (props: any) => {
 
   useEffect(() => {
     if (dataUpdate?._id) {
-      const arrThumbnail = [
+      const arrThumbnail: {
+        uid: string
+        name: string
+        status: string
+        url: string
+      }[] = [
         {
           uid: uuidv4(),
           name: dataUpdate.thumbnail,
           status: 'done',
-          url: `${import.meta.env.VITE_BACKEND_URL}/images/book/${dataUpdate.thumbnail}`,
+          url: `${import.meta.env.VITE_BACKEND_API_URL}/images/book/${dataUpdate.thumbnail}`,
         },
       ]
 
-      const arrSlider = dataUpdate?.slider?.map((item: any) => {
+      const arrSlider = dataUpdate?.slider?.map((item: string) => {
         return {
           uid: uuidv4(),
           name: item,
           status: 'done',
-          url: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
+          url: `${import.meta.env.VITE_BACKEND_API_URL}/images/book/${item}`,
         }
       })
 
@@ -96,7 +149,7 @@ const BookModalUpdate = (props: any) => {
     }
   }, [dataUpdate])
 
-  const onFinish = async (values) => {
+  const onFinish = async (values: InitData) => {
     if (dataThumbnail.length === 0) {
       notification.error({
         message: 'Lỗi validate',
@@ -133,7 +186,7 @@ const BookModalUpdate = (props: any) => {
       form.resetFields()
       setDataSlider([])
       setDataThumbnail([])
-      setOpenModalUpdate(false)
+      setOpen(false)
       await props.fetchBook()
     } else {
       notification.error({
@@ -144,13 +197,13 @@ const BookModalUpdate = (props: any) => {
     setIsSubmit(false)
   }
 
-  const getBase64 = (img: any, callback: any) => {
+  const getBase64 = (img: File, callback: (url: string) => void) => {
     const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result))
+    reader.addEventListener('load', () => callback(reader.result as string))
     reader.readAsDataURL(img)
   }
 
-  const beforeUpload = (file: any) => {
+  const beforeUpload = (file: File) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
     if (!isJpgOrPng) {
       message.error('You can only upload JPG/PNG file!')
@@ -162,7 +215,7 @@ const BookModalUpdate = (props: any) => {
     return isJpgOrPng && isLt2M
   }
 
-  const handleChange = (info: any, type: any) => {
+  const handleChange = (info: UploadChangeParam<UploadFile>, type: string) => {
     if (info.file.status === 'uploading') {
       type ? setLoadingSlider(true) : setLoading(true)
       return
@@ -175,13 +228,12 @@ const BookModalUpdate = (props: any) => {
       })
     }
   }
-
-  const handleUploadFileThumbnail = async ({
-    file,
-    onSuccess,
-    onError,
-  }: any) => {
-    const res = await callUploadBookImg(file)
+  const handleUploadFileThumbnail = async (
+    file: UploadFile,
+    onSuccess: () => void,
+    onError: () => void,
+  ) => {
+    const res = await callUploadBookImg(file.originFileObj as File)
     if (res && res.data) {
       setDataThumbnail([
         {
@@ -189,14 +241,18 @@ const BookModalUpdate = (props: any) => {
           uid: file.uid,
         },
       ])
-      onSuccess('ok')
+      onSuccess()
     } else {
-      onError('Đã có lỗi khi upload file')
+      onError()
     }
   }
 
-  const handleUploadFileSlider = async ({ file, onSuccess, onError }: any) => {
-    const res = await callUploadBookImg(file)
+  const handleUploadFileSlider = async (
+    file: UploadFile,
+    onSuccess: () => void,
+    onError: () => void,
+  ) => {
+    const res = await callUploadBookImg(file.originFileObj as File)
     if (res && res.data) {
       //copy previous state => upload multiple images
       setDataSlider((dataSlider) => [
@@ -206,13 +262,13 @@ const BookModalUpdate = (props: any) => {
           uid: file.uid,
         },
       ])
-      onSuccess('ok')
+      onSuccess()
     } else {
-      onError('Đã có lỗi khi upload file')
+      onError()
     }
   }
 
-  const handleRemoveFile = (file, type) => {
+  const handleRemoveFile = (file: UploadFile, type: string) => {
     if (type === 'thumbnail') {
       setDataThumbnail([])
     }
@@ -222,7 +278,7 @@ const BookModalUpdate = (props: any) => {
     }
   }
 
-  const handlePreview = async (file) => {
+  const handlePreview = async (file: UploadFile) => {
     if (file.url && !file.originFileObj) {
       setPreviewImage(file.url)
       setPreviewOpen(true)
@@ -244,7 +300,7 @@ const BookModalUpdate = (props: any) => {
     <>
       <Modal
         title='Thêm mới book'
-        open={openModalUpdate}
+        open={open}
         onOk={() => {
           form.submit()
         }}
@@ -252,7 +308,7 @@ const BookModalUpdate = (props: any) => {
           form.resetFields()
           setInitForm(null)
           setDataUpdate(null)
-          setOpenModalUpdate(false)
+          setOpen(false)
         }}
         okText={'Tạo mới'}
         cancelText={'Hủy'}
@@ -352,6 +408,7 @@ const BookModalUpdate = (props: any) => {
                 label='Ảnh Thumbnail'
                 name='thumbnail'
               >
+                {/* @ts-expect-error: ignore error */}
                 <Upload
                   name='thumbnail'
                   listType='picture-card'
@@ -378,6 +435,7 @@ const BookModalUpdate = (props: any) => {
                 label='Ảnh Slider'
                 name='slider'
               >
+                {/* @ts-expect-error: ignore error */}
                 <Upload
                   multiple
                   name='slider'

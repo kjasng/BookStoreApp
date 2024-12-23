@@ -70,7 +70,7 @@ const BookDetail = ({
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [categoryList, setCategoryList] = useState<BookCategory[]>([])
 
-  const [defaultData, setDefaultData] = useState<DataType>()
+  const [defaultData, setDefaultData] = useState<DataType | null>(null)
   const [modalUploadOpen, setModalUploadOpen] = useState(false)
 
   const handlePreview = async (file: UploadFile) => {
@@ -84,7 +84,6 @@ const BookDetail = ({
 
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
     setFileList(newFileList)
-    console.log('newFileList: ', newFileList)
   }
 
   const showDrawer = () => {
@@ -370,15 +369,14 @@ const BookDetail = ({
         loadBookList={loadBookList}
       />
 
-      {modalUploadOpen && (
-        <BookModalUpload
-          dataUpdate={defaultData}
-          setDataUpdate={setDefaultData}
-          open={modalUploadOpen}
-          setOpenModalUpdate={setModalUploadOpen}
-          categoryList={categoryList}
-        />
-      )}
+      <BookModalUpload
+        dataUpdate={defaultData}
+        setDataUpdate={setDefaultData}
+        open={modalUploadOpen}
+        setOpen={setModalUploadOpen}
+        categoryList={categoryList}
+        fetchBook={loadBookList}
+      />
     </div>
   )
 }
