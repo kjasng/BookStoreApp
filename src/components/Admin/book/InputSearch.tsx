@@ -68,7 +68,7 @@ const InputSearch = () => {
         <div className="flex flex-col justify-center items-center w-full p-4 gap-4">
             <Form
                 form={form}
-                name="search-user"
+                name="search-book"
                 onFinish={onFinish}
                 className="w-full flex flex-col justify-center items-center px-4 pt-8 bg-gray-200 rounded-xl"
             >

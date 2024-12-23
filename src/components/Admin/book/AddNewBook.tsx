@@ -1,4 +1,4 @@
-import { callUploadBookImg } from "@/services/api";
+import { addNewBook, callUploadBookImg } from "@/services/api";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps, UploadFile } from "antd";
 import {
@@ -29,6 +29,17 @@ interface FileType {
     type: string;
     size: number;
     uid: string;
+}
+
+interface BookData {
+    thumbnail: string;
+    slider: string[];
+    mainText: string;
+    author: string;
+    price: number;
+    sold: number;
+    quantity: number;
+    category: string;
 }
 
 interface ImageType {
@@ -68,11 +79,13 @@ const AddNewBook = ({
     isModalOpen,
     handleOk,
     setIsModalOpen,
+    loadBookList,
 }: {
     categoryList: BookCategory[];
     isModalOpen: boolean;
     handleOk: () => void;
     setIsModalOpen: (value: boolean) => void;
+    loadBookList: () => void;
 }) => {
     const [loadingSlider, setLoadingSlider] = useState(false);
     const [loadingThumbnail, setLoadingThumbnail] = useState(false);
@@ -89,10 +102,29 @@ const AddNewBook = ({
         undefined,
     );
 
-    const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-        console.log("Check dataThumbnail", dataThumbnail);
-        console.log("Check dataSlider", dataSlider);
-        console.log("Success:", values);
+    const onFinish: FormProps<BookData>["onFinish"] = async (values) => {
+        const data: BookData = {
+            thumbnail: dataThumbnail[0].name,
+            slider: dataSlider.map((x) => x.name),
+            mainText: values.mainText,
+            author: values.author,
+            price: values.price,
+            sold: values.sold,
+            quantity: values.quantity,
+            category: values.category,
+        };
+        const res = await addNewBook(data);
+        console.log(res);
+        if (res && res.data) {
+            message.success("Thêm mới sách thành công");
+            form.resetFields();
+            setDataSlider([]);
+            setDataThumbnail([]);
+            await loadBookList();
+            setIsModalOpen(false);
+        } else {
+            message.error(res.data.message);
+        }
     };
 
     const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -207,6 +239,7 @@ const AddNewBook = ({
                 style={{ maxWidth: 720 }}
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
+                // @ts-expect-error: ignore error
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
                 className="flex flex-col gap-4 items-end"
@@ -217,7 +250,12 @@ const AddNewBook = ({
                     <Form.Item<FieldType>
                         label="Tên sách"
                         name="mainText"
-                        required
+                        rules={[
+                            {
+                                required: true,
+                                message: "Vui lòng nhập tên sách",
+                            },
+                        ]}
                         className="w-[calc(50%-10px)]"
                     >
                         <Input />
@@ -227,7 +265,12 @@ const AddNewBook = ({
                         label="Tác giả"
                         name="author"
                         className="w-[calc(50%-10px)]"
-                        required
+                        rules={[
+                            {
+                                required: true,
+                                message: "Vui lòng nhập tên tác giả",
+                            },
+                        ]}
                     >
                         <Input />
                     </Form.Item>
@@ -236,7 +279,12 @@ const AddNewBook = ({
                         <Form.Item
                             label="Giá tiền"
                             name="price"
-                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng nhập số tiền",
+                                },
+                            ]}
                             className="w-[calc(50%-12px)]"
                         >
                             <InputNumber
@@ -253,7 +301,12 @@ const AddNewBook = ({
                         <Form.Item
                             label="Thể loại"
                             name="category"
-                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng nhập thể loại",
+                                },
+                            ]}
                             className="w-[calc(50%-12px)]"
                         >
                             <Select
@@ -266,20 +319,31 @@ const AddNewBook = ({
                         <Form.Item
                             label="Số lượng"
                             name="quantity"
-                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng nhập số lượng",
+                                },
+                            ]}
                             className="w-1/2"
                         >
-                            <InputNumber addonAfter="VND" min={0} />
+                            <InputNumber min={0} className="w-full" />
                         </Form.Item>
                         <Form.Item
                             label="Đã bán"
                             name="sold"
-                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng nhập đã bán",
+                                },
+                            ]}
                             className="w-1/2"
                         >
                             <InputNumber
                                 className="w-[calc(100%-10px)]"
-                                min={0}
+                                min={1}
+                                defaultValue={0}
                             />
                         </Form.Item>
                     </div>
@@ -287,7 +351,15 @@ const AddNewBook = ({
                 <div className="flex w-full ">
                     <div className="w-1/2 gap-4 flex flex-col">
                         <h1>Ảnh thumbnail</h1>
-                        <Form.Item name="thumbnail">
+                        <Form.Item
+                            name="thumbnail"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng upload ảnh thumbnail",
+                                },
+                            ]}
+                        >
                             <Upload
                                 listType="picture-card"
                                 multiple={false}
@@ -319,7 +391,15 @@ const AddNewBook = ({
                     </div>
                     <div className="w-1/2 gap-4 flex flex-col">
                         <h1>Ảnh slider</h1>
-                        <Form.Item name="slider">
+                        <Form.Item
+                            name="slider"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng upload ảnh slider",
+                                },
+                            ]}
+                        >
                             <Upload
                                 listType="picture-card"
                                 multiple={true}
