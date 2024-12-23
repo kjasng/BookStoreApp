@@ -29,10 +29,7 @@ const Header = () => {
     const dispatch = useDispatch();
     let userAvatar = "";
     if (user?.avatar.length > 0) {
-        console.log(userAvatar.length);
-
         userAvatar = `${import.meta.env.VITE_BACKEND_API_URL}/images/avatar/${user?.avatar}`;
-        console.log(userAvatar.length);
     }
 
     const [open, setOpen] = useState<boolean>(false);
