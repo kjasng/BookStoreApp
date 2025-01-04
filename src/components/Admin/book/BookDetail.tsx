@@ -13,16 +13,15 @@ import {
   Image,
   message,
   Popconfirm,
-  Popover,
-  Space,
   Table,
   TableColumnsType,
   TableProps,
   Upload,
 } from "antd"
 import { v4 as uuidv4 } from "uuid"
+import * as XLSX from "xlsx"
 
-import type { PopconfirmProps, UploadFile, UploadProps } from "antd"
+import type { UploadFile, UploadProps } from "antd"
 
 import moment from "moment"
 import { useEffect, useState } from "react"
@@ -163,16 +162,6 @@ const BookDetail = ({
     }
   }
 
-  const confirm: PopconfirmProps["onConfirm"] = (e) => {
-    console.log(e)
-    message.success("Click on Yes")
-  }
-
-  const cancel: PopconfirmProps["onCancel"] = (e) => {
-    console.log(e)
-    message.error("Click on No")
-  }
-
   const columns: TableColumnsType<DataType> = [
     {
       title: "Id",
@@ -230,7 +219,9 @@ const BookDetail = ({
             title="Bạn có muốn xóa sách này không?"
             description="Sách sẽ bị xóa vĩnh viễn"
             onConfirm={() => handleDeleteBook(record._id)}
-            onCancel={cancel}
+            onCancel={() => {
+              message.error("Hủy xóa sách")
+            }}
             okText="Xóa"
             cancelText="Hủy"
             placement="left"
@@ -285,12 +276,23 @@ const BookDetail = ({
     }
   }
 
+  const handleExport = () => {
+    if (bookList.length > 0) {
+      const worksheet = XLSX.utils.json_to_sheet(bookList)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Books")
+      XLSX.writeFile(workbook, "book.xlsx", { compression: true })
+    }
+  }
+
   const renderTitle = () => {
     return (
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-bold">Book List</h1>
         <div className="flex gap-2">
-          <Button type="primary">Export</Button>
+          <Button type="primary" onClick={handleExport}>
+            Export
+          </Button>
           <Button type="primary" onClick={showModal}>
             Thêm mới
           </Button>

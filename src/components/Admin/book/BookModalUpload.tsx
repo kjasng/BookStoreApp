@@ -173,7 +173,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
 
     setIsSubmit(true)
     const res = await updateBook(
-      dataUpdate?._id,
+      dataUpdate?._id || "",
       mainText,
       author,
       price,
