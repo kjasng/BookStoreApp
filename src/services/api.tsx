@@ -153,3 +153,12 @@ export const updateBook = async (
 export const deleteBook = async (id: string) => {
   return axios.delete(`/api/v1/book/${id}`)
 }
+
+export const loadBookHome = async (current: number, pageSize: number, sort: string) => {
+  return axios.get(`/api/v1/book?current=${current}&pageSize=${pageSize}&${sort}`)
+}
+
+export const getAllBook = async () => {
+  return axios.get("/api/v1/book")
+}
+
