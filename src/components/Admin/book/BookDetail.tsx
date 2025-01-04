@@ -1,24 +1,33 @@
-import { callFetchCategory, getBookList, searchBook } from '@/services/api'
-import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
+import {
+  callFetchCategory,
+  deleteBook,
+  getBookList,
+  searchBook,
+} from "@/services/api"
+import { DeleteOutlined, EditOutlined, ReloadOutlined } from "@ant-design/icons"
 import {
   Badge,
   Button,
   Descriptions,
   Drawer,
   Image,
+  message,
+  Popconfirm,
+  Popover,
+  Space,
   Table,
   TableColumnsType,
   TableProps,
   Upload,
-} from 'antd'
-import { v4 as uuidv4 } from 'uuid'
+} from "antd"
+import { v4 as uuidv4 } from "uuid"
 
-import type { UploadFile, UploadProps } from 'antd'
+import type { PopconfirmProps, UploadFile, UploadProps } from "antd"
 
-import moment from 'moment'
-import { useEffect, useState } from 'react'
-import AddNewBook from './AddNewBook'
-import BookModalUpload from './BookModalUpload'
+import moment from "moment"
+import { useEffect, useState } from "react"
+import AddNewBook from "./AddNewBook"
+import BookModalUpload from "./BookModalUpload"
 interface DataType {
   _id: string
   mainText: string
@@ -60,13 +69,13 @@ const BookDetail = ({
   setBookList: (bookList: DataType[]) => void
   query: string
 }) => {
-  const sortQuery = '&sort=-updatedAt'
+  const sortQuery = "&sort=-updatedAt"
   const [bookDetail, setBookDetail] = useState<DataType>()
   const [open, setOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [previewOpen, setPreviewOpen] = useState(false) //eslint-disable-line
-  const [previewImage, setPreviewImage] = useState('') //eslint-disable-line
+  const [previewImage, setPreviewImage] = useState("") //eslint-disable-line
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [categoryList, setCategoryList] = useState<BookCategory[]>([])
 
@@ -82,7 +91,7 @@ const BookDetail = ({
     setPreviewOpen(true)
   }
 
-  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList)
   }
 
@@ -105,17 +114,17 @@ const BookDetail = ({
   useEffect(() => {
     if (bookDetail) {
       let imgThumbnail: UploadFile = {
-        uid: '',
-        name: '',
-        status: 'done',
-        url: '',
+        uid: "",
+        name: "",
+        status: "done",
+        url: "",
       }
       const imgSlider: UploadFile[] = []
       if (bookDetail.thumbnail) {
         imgThumbnail = {
           uid: uuidv4(),
           name: bookDetail.thumbnail,
-          status: 'done',
+          status: "done",
           url: `${import.meta.env.VITE_BACKEND_API_URL}/images/book/${bookDetail.thumbnail}`,
         }
       }
@@ -124,7 +133,7 @@ const BookDetail = ({
           imgSlider.push({
             uid: uuidv4(),
             name: item,
-            status: 'done',
+            status: "done",
             url: `${import.meta.env.VITE_BACKEND_API_URL}/images/book/${item}`,
           })
         })
@@ -146,16 +155,34 @@ const BookDetail = ({
     fetchCategory()
   }, [])
 
+  const handleDeleteBook = async (id: string) => {
+    const res = await deleteBook(id)
+    if (res && res.data) {
+      message.success("Xóa book thành công")
+      await loadBookList()
+    }
+  }
+
+  const confirm: PopconfirmProps["onConfirm"] = (e) => {
+    console.log(e)
+    message.success("Click on Yes")
+  }
+
+  const cancel: PopconfirmProps["onCancel"] = (e) => {
+    console.log(e)
+    message.error("Click on No")
+  }
+
   const columns: TableColumnsType<DataType> = [
     {
-      title: 'Id',
-      dataIndex: '_id',
+      title: "Id",
+      dataIndex: "_id",
       sorter: true,
       render: (id, record) => {
         return (
-          <div className='flex justify-center items-center'>
+          <div className="flex justify-center items-center">
             <a
-              className='text-center text-blue-500'
+              className="text-center text-blue-500"
               onClick={() => {
                 setBookDetail(record)
                 showDrawer()
@@ -168,46 +195,56 @@ const BookDetail = ({
       },
     },
     {
-      title: 'Tên sách',
-      dataIndex: 'mainText',
+      title: "Tên sách",
+      dataIndex: "mainText",
       sorter: true,
     },
     {
-      title: 'Thể loại',
-      dataIndex: 'category',
+      title: "Thể loại",
+      dataIndex: "category",
       sorter: true,
     },
     {
-      title: 'Tác giả',
-      dataIndex: 'author',
+      title: "Tác giả",
+      dataIndex: "author",
       sorter: true,
     },
     {
-      title: 'Giá',
-      dataIndex: 'price',
+      title: "Giá",
+      dataIndex: "price",
       sorter: true,
       render: (price) => <span>{price.toLocaleString()} VNĐ</span>,
     },
     {
-      title: 'Updated at',
-      dataIndex: 'updatedAt',
+      title: "Updated at",
+      dataIndex: "updatedAt",
       sorter: true,
-      render: (updatedAt) => moment(updatedAt).format('DD/MM/YYYY hh:mm:ss'),
+      render: (updatedAt) => moment(updatedAt).format("DD/MM/YYYY hh:mm:ss"),
     },
     {
-      title: 'Action',
+      title: "Action",
       width: 100,
       render: (_, record) => (
-        <div className='flex gap-2'>
-          <Button
-            type='ghost'
-            className='bg-white text-red-500 border-none flex items-center justify-center hover:bg-red-500 hover:text-white'
+        <div className="flex gap-2">
+          <Popconfirm
+            title="Bạn có muốn xóa sách này không?"
+            description="Sách sẽ bị xóa vĩnh viễn"
+            onConfirm={() => handleDeleteBook(record._id)}
+            onCancel={cancel}
+            okText="Xóa"
+            cancelText="Hủy"
+            placement="left"
           >
-            <DeleteOutlined />
-          </Button>
+            <Button
+              type="ghost"
+              className="bg-red-500 text-white border-none hover:bg-red-800/80 hover:text-white flex items-center justify-center"
+            >
+              <DeleteOutlined />
+            </Button>
+          </Popconfirm>
           <Button
-            type='ghost'
-            className='bg-white text-orange-300 border-none flex items-center justify-center hover:bg-orange-300 hover:text-white'
+            type="ghost"
+            className="bg-white text-orange-300 border-none flex items-center justify-center hover:bg-orange-300 hover:text-white"
             onClick={() => {
               setDefaultData(record)
               setModalUploadOpen(true)
@@ -219,7 +256,7 @@ const BookDetail = ({
       ),
     },
   ]
-  const onChange: TableProps<DataType>['onChange'] = (
+  const onChange: TableProps<DataType>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -236,7 +273,7 @@ const BookDetail = ({
   const sortBook = (value: SortType) => {
     if (value && value.field) {
       // const q = value.order === "ascend" ? "-" : "";
-      const q = `${query}&sort=${value.order === 'ascend' ? '' : '-'}${value.field}`
+      const q = `${query}&sort=${value.order === "ascend" ? "" : "-"}${value.field}`
 
       searchBook(1, 10, q)
         .then((res) => {
@@ -250,16 +287,16 @@ const BookDetail = ({
 
   const renderTitle = () => {
     return (
-      <div className='flex justify-between items-center'>
-        <h1 className='text-xl font-bold'>Book List</h1>
-        <div className='flex gap-2'>
-          <Button type='primary'>Export</Button>
-          <Button type='primary' onClick={showModal}>
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold">Book List</h1>
+        <div className="flex gap-2">
+          <Button type="primary">Export</Button>
+          <Button type="primary" onClick={showModal}>
             Thêm mới
           </Button>
           <Button
-            type='ghost'
-            className='hover:bg-gray-200 flex items-center gap-2'
+            type="ghost"
+            className="hover:bg-gray-200 flex items-center gap-2"
           >
             <ReloadOutlined />
           </Button>
@@ -273,17 +310,17 @@ const BookDetail = ({
   }, [])
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       <Table
         title={renderTitle}
         columns={columns}
         dataSource={bookList}
         onChange={onChange}
-        className='w-full'
+        className="w-full"
         pagination={{
           defaultPageSize: 5,
           showSizeChanger: true,
-          pageSizeOptions: ['1', '5', '10'],
+          pageSizeOptions: ["1", "5", "10"],
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} trên ${total} rows`,
         }}
@@ -291,52 +328,52 @@ const BookDetail = ({
       {open && (
         <>
           <Drawer
-            title='Chức năng xem chi tiết'
+            title="Chức năng xem chi tiết"
             onClose={onClose}
             open={open}
             closable={true}
             width={800}
           >
             <Descriptions
-              title='User Info'
+              title="User Info"
               bordered
-              layout='horizontal'
+              layout="horizontal"
               column={2}
             >
-              <Descriptions.Item label='ID'>
+              <Descriptions.Item label="ID">
                 {bookDetail?._id}
               </Descriptions.Item>
-              <Descriptions.Item label='Tên sách'>
+              <Descriptions.Item label="Tên sách">
                 {bookDetail?.mainText}
               </Descriptions.Item>
-              <Descriptions.Item label='Tác giả'>
+              <Descriptions.Item label="Tác giả">
                 {bookDetail?.author}
               </Descriptions.Item>
-              <Descriptions.Item label='Giá tiền'>
+              <Descriptions.Item label="Giá tiền">
                 {bookDetail?.price.toLocaleString()} VNĐ
               </Descriptions.Item>
-              <Descriptions.Item label='Số lượng'>
+              <Descriptions.Item label="Số lượng">
                 {bookDetail?.quantity}
               </Descriptions.Item>
-              <Descriptions.Item label='Đã bán'>
+              <Descriptions.Item label="Đã bán">
                 {bookDetail?.sold}
               </Descriptions.Item>
-              <Descriptions.Item label='Category' span={2}>
-                <Badge status='processing' text={bookDetail?.category} />
+              <Descriptions.Item label="Category" span={2}>
+                <Badge status="processing" text={bookDetail?.category} />
               </Descriptions.Item>
-              <Descriptions.Item label='Created at'>
-                {moment(bookDetail?.createdAt).format('DD/MM/YYYY hh:mm:ss')}
+              <Descriptions.Item label="Created at">
+                {moment(bookDetail?.createdAt).format("DD/MM/YYYY hh:mm:ss")}
               </Descriptions.Item>
-              <Descriptions.Item label='Updated at'>
-                {moment(bookDetail?.updatedAt).format('DD/MM/YYYY hh:mm:ss')}
+              <Descriptions.Item label="Updated at">
+                {moment(bookDetail?.updatedAt).format("DD/MM/YYYY hh:mm:ss")}
               </Descriptions.Item>
             </Descriptions>
 
-            <div className='flex flex-col gap-1 mt-12'>
+            <div className="flex flex-col gap-1 mt-12">
               <h1>Ảnh book</h1>
               <Upload
                 // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-                listType='picture-card'
+                listType="picture-card"
                 fileList={fileList}
                 onPreview={handlePreview}
                 onChange={handleChange}
@@ -346,7 +383,7 @@ const BookDetail = ({
               ></Upload>
               {previewImage && (
                 <Image
-                  wrapperStyle={{ display: 'none' }}
+                  wrapperStyle={{ display: "none" }}
                   preview={{
                     visible: previewOpen,
                     onVisibleChange: (visible) => {

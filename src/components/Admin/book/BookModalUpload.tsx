@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react"
 import {
   Col,
   Divider,
@@ -12,15 +12,16 @@ import {
   Select,
   Upload,
   UploadFile,
-} from 'antd'
+} from "antd"
 import {
   addNewBook,
   callFetchCategory,
   callUploadBookImg,
-} from '../../../services/api'
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
-import { v4 as uuidv4 } from 'uuid'
-import { UploadChangeParam } from 'antd/es/upload'
+  updateBook,
+} from "../../../services/api"
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons"
+import { v4 as uuidv4 } from "uuid"
+import { UploadChangeParam } from "antd/es/upload"
 
 interface IDataUpdate {
   _id: string
@@ -79,14 +80,14 @@ const BookModalUpdate = (props: IBookModalUpload) => {
   const [loading, setLoading] = useState(false)
   const [loadingSlider, setLoadingSlider] = useState(false)
 
-  const [imageUrl, setImageUrl] = useState('') // eslint-disable-line
+  const [imageUrl, setImageUrl] = useState("") // eslint-disable-line
 
   const [dataThumbnail, setDataThumbnail] = useState<DataSlider[]>([])
   const [dataSlider, setDataSlider] = useState<DataSlider[]>([])
 
   const [previewOpen, setPreviewOpen] = useState(false)
-  const [previewImage, setPreviewImage] = useState('')
-  const [previewTitle, setPreviewTitle] = useState('')
+  const [previewImage, setPreviewImage] = useState("")
+  const [previewTitle, setPreviewTitle] = useState("")
 
   const [initForm, setInitForm] = useState<InitData | null>(null)
 
@@ -114,7 +115,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
         {
           uid: uuidv4(),
           name: dataUpdate.thumbnail,
-          status: 'done',
+          status: "done",
           url: `${import.meta.env.VITE_BACKEND_API_URL}/images/book/${dataUpdate.thumbnail}`,
         },
       ]
@@ -123,7 +124,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
         return {
           uid: uuidv4(),
           name: item,
-          status: 'done',
+          status: "done",
           url: `${import.meta.env.VITE_BACKEND_API_URL}/images/book/${item}`,
         }
       })
@@ -152,16 +153,16 @@ const BookModalUpdate = (props: IBookModalUpload) => {
   const onFinish = async (values: InitData) => {
     if (dataThumbnail.length === 0) {
       notification.error({
-        message: 'Lỗi validate',
-        description: 'Vui lòng upload ảnh thumbnail',
+        message: "Lỗi validate",
+        description: "Vui lòng upload ảnh thumbnail",
       })
       return
     }
 
     if (dataSlider.length === 0) {
       notification.error({
-        message: 'Lỗi validate',
-        description: 'Vui lòng upload ảnh slider',
+        message: "Lỗi validate",
+        description: "Vui lòng upload ảnh slider",
       })
       return
     }
@@ -171,18 +172,19 @@ const BookModalUpdate = (props: IBookModalUpload) => {
     const slider = dataSlider.map((item) => item.name)
 
     setIsSubmit(true)
-    const res = await addNewBook(
-      thumbnail,
-      slider,
+    const res = await updateBook(
+      dataUpdate?._id,
       mainText,
       author,
       price,
       sold,
       quantity,
       category,
+      thumbnail,
+      slider,
     )
     if (res && res.data) {
-      message.success('Tạo mới book thành công')
+      message.success("Cập nhật book thành công")
       form.resetFields()
       setDataSlider([])
       setDataThumbnail([])
@@ -190,7 +192,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
       await props.fetchBook()
     } else {
       notification.error({
-        message: 'Đã có lỗi xảy ra',
+        message: "Đã có lỗi xảy ra",
         description: res.data.message,
       })
     }
@@ -199,28 +201,28 @@ const BookModalUpdate = (props: IBookModalUpload) => {
 
   const getBase64 = (img: File, callback: (url: string) => void) => {
     const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result as string))
+    reader.addEventListener("load", () => callback(reader.result as string))
     reader.readAsDataURL(img)
   }
 
   const beforeUpload = (file: File) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png"
     if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!')
+      message.error("You can only upload JPG/PNG file!")
     }
     const isLt2M = file.size / 1024 / 1024 < 2
     if (!isLt2M) {
-      message.error('Image must smaller than 2MB!')
+      message.error("Image must smaller than 2MB!")
     }
     return isJpgOrPng && isLt2M
   }
 
   const handleChange = (info: UploadChangeParam<UploadFile>, type: string) => {
-    if (info.file.status === 'uploading') {
+    if (info.file.status === "uploading") {
       type ? setLoadingSlider(true) : setLoading(true)
       return
     }
-    if (info.file.status === 'done') {
+    if (info.file.status === "done") {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj, (url) => {
         type ? setLoadingSlider(false) : setLoading(false)
@@ -269,10 +271,10 @@ const BookModalUpdate = (props: IBookModalUpload) => {
   }
 
   const handleRemoveFile = (file: UploadFile, type: string) => {
-    if (type === 'thumbnail') {
+    if (type === "thumbnail") {
       setDataThumbnail([])
     }
-    if (type === 'slider') {
+    if (type === "slider") {
       const newSlider = dataSlider.filter((x) => x.uid !== file.uid)
       setDataSlider(newSlider)
     }
@@ -283,7 +285,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
       setPreviewImage(file.url)
       setPreviewOpen(true)
       setPreviewTitle(
-        file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+        file.name || file.url.substring(file.url.lastIndexOf("/") + 1),
       )
       return
     }
@@ -291,7 +293,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
       setPreviewImage(url)
       setPreviewOpen(true)
       setPreviewTitle(
-        file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+        file.name || file.url.substring(file.url.lastIndexOf("/") + 1),
       )
     })
   }
@@ -299,7 +301,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
   return (
     <>
       <Modal
-        title='Thêm mới book'
+        title="Cập nhật book"
         open={open}
         onOk={() => {
           form.submit()
@@ -310,24 +312,24 @@ const BookModalUpdate = (props: IBookModalUpload) => {
           setDataUpdate(null)
           setOpen(false)
         }}
-        okText={'Tạo mới'}
-        cancelText={'Hủy'}
+        okText={"Cập nhật"}
+        cancelText={"Hủy"}
         confirmLoading={isSubmit}
-        width={'50vw'}
+        width={"50vw"}
         //do not close when click outside
         maskClosable={false}
       >
         <Divider />
 
-        <Form form={form} name='basic' onFinish={onFinish} autoComplete='off'>
+        <Form form={form} name="basic" onFinish={onFinish} autoComplete="off">
           <Row gutter={15}>
             <Col span={12}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Tên sách'
-                name='mainText'
+                label="Tên sách"
+                name="mainText"
                 rules={[
-                  { required: true, message: 'Vui lòng nhập tên hiển thị!' },
+                  { required: true, message: "Vui lòng nhập tên hiển thị!" },
                 ]}
               >
                 <Input />
@@ -336,9 +338,9 @@ const BookModalUpdate = (props: IBookModalUpload) => {
             <Col span={12}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Tác giả'
-                name='author'
-                rules={[{ required: true, message: 'Vui lòng nhập tác giả!' }]}
+                label="Tác giả"
+                name="author"
+                rules={[{ required: true, message: "Vui lòng nhập tác giả!" }]}
               >
                 <Input />
               </Form.Item>
@@ -346,26 +348,26 @@ const BookModalUpdate = (props: IBookModalUpload) => {
             <Col span={6}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Giá tiền'
-                name='price'
-                rules={[{ required: true, message: 'Vui lòng nhập giá tiền!' }]}
+                label="Giá tiền"
+                name="price"
+                rules={[{ required: true, message: "Vui lòng nhập giá tiền!" }]}
               >
                 <InputNumber
                   min={0}
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
-                  addonAfter='VND'
+                  addonAfter="VND"
                 />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Thể loại'
-                name='category'
-                rules={[{ required: true, message: 'Vui lòng chọn thể loại!' }]}
+                label="Thể loại"
+                name="category"
+                rules={[{ required: true, message: "Vui lòng chọn thể loại!" }]}
               >
                 <Select
                   defaultValue={null}
@@ -379,46 +381,46 @@ const BookModalUpdate = (props: IBookModalUpload) => {
             <Col span={6}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Số lượng'
-                name='quantity'
-                rules={[{ required: true, message: 'Vui lòng nhập số lượng!' }]}
+                label="Số lượng"
+                name="quantity"
+                rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
               >
-                <InputNumber min={1} style={{ width: '100%' }} />
+                <InputNumber min={1} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Đã bán'
-                name='sold'
+                label="Đã bán"
+                name="sold"
                 rules={[
-                  { required: true, message: 'Vui lòng nhập số lượng đã bán!' },
+                  { required: true, message: "Vui lòng nhập số lượng đã bán!" },
                 ]}
               >
                 <InputNumber
                   min={0}
                   defaultValue={0}
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Ảnh Thumbnail'
-                name='thumbnail'
+                label="Ảnh Thumbnail"
+                name="thumbnail"
               >
                 {/* @ts-expect-error: ignore error */}
                 <Upload
-                  name='thumbnail'
-                  listType='picture-card'
-                  className='avatar-uploader'
+                  name="thumbnail"
+                  listType="picture-card"
+                  className="avatar-uploader"
                   maxCount={1}
                   multiple={false}
                   customRequest={handleUploadFileThumbnail}
                   beforeUpload={beforeUpload}
-                  onChange={(info) => handleChange(info, 'thumbnail')}
-                  onRemove={(file) => handleRemoveFile(file, 'thumbnail')}
+                  onChange={(info) => handleChange(info, "thumbnail")}
+                  onRemove={(file) => handleRemoveFile(file, "thumbnail")}
                   onPreview={handlePreview}
                   defaultFileList={initForm?.thumbnail?.fileList ?? []}
                 >
@@ -432,19 +434,19 @@ const BookModalUpdate = (props: IBookModalUpload) => {
             <Col span={12}>
               <Form.Item
                 labelCol={{ span: 24 }}
-                label='Ảnh Slider'
-                name='slider'
+                label="Ảnh Slider"
+                name="slider"
               >
                 {/* @ts-expect-error: ignore error */}
                 <Upload
                   multiple
-                  name='slider'
-                  listType='picture-card'
-                  className='avatar-uploader'
+                  name="slider"
+                  listType="picture-card"
+                  className="avatar-uploader"
                   customRequest={handleUploadFileSlider}
                   beforeUpload={beforeUpload}
-                  onChange={(info) => handleChange(info, 'slider')}
-                  onRemove={(file) => handleRemoveFile(file, 'slider')}
+                  onChange={(info) => handleChange(info, "slider")}
+                  onRemove={(file) => handleRemoveFile(file, "slider")}
                   onPreview={handlePreview}
                   defaultFileList={initForm?.slider?.fileList ?? []}
                 >
@@ -464,7 +466,7 @@ const BookModalUpdate = (props: IBookModalUpload) => {
         footer={null}
         onCancel={() => setPreviewOpen(false)}
       >
-        <img alt='example' style={{ width: '100%' }} src={previewImage} />
+        <img alt="example" style={{ width: "100%" }} src={previewImage} />
       </Modal>
     </>
   )

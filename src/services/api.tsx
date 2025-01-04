@@ -1,4 +1,4 @@
-import { axiosInstance as axios } from '@/utils/axios-customize'
+import { axiosInstance as axios } from "@/utils/axios-customize"
 
 interface UpdateUser {
   _id: string
@@ -18,7 +18,7 @@ export const callRequest = async (
   password: string,
   phone: number,
 ) => {
-  return axios.post('/api/v1/user/register', {
+  return axios.post("/api/v1/user/register", {
     fullName,
     email,
     password,
@@ -27,15 +27,15 @@ export const callRequest = async (
 }
 
 export const loginRequest = async (username: string, password: string) => {
-  return axios.post('api/v1/auth/login', { username, password })
+  return axios.post("api/v1/auth/login", { username, password })
 }
 
 export const logoutRequest = async () => {
-  return axios.post('api/v1/auth/logout')
+  return axios.post("api/v1/auth/logout")
 }
 
 export const callFetchAccount = async () => {
-  return axios.get('api/v1/auth/account')
+  return axios.get("api/v1/auth/account")
 }
 
 export const getUser = async (current: number, pageSize: number) => {
@@ -64,7 +64,7 @@ export const updateUser = async (id: string, data: UpdateUser) => {
 }
 
 export const AddNewUserApi = async (data: AddNewUser) => {
-  return axios.post('/api/v1/user', data)
+  return axios.post("/api/v1/user", data)
 }
 
 export const getBookList = async (
@@ -88,19 +88,19 @@ export const searchBook = async (
 }
 
 export const callFetchCategory = async () => {
-  return axios.get('/api/v1/database/category')
+  return axios.get("/api/v1/database/category")
 }
 
 export const callUploadBookImg = (fileImg: File) => {
   const bodyFormData = new FormData()
-  bodyFormData.append('fileImg', fileImg)
+  bodyFormData.append("fileImg", fileImg)
   return axios({
-    method: 'POST',
-    url: '/api/v1/file/upload',
+    method: "POST",
+    url: "/api/v1/file/upload",
     data: bodyFormData,
     headers: {
-      'Content-Type': 'multipart/form-data',
-      'upload-type': 'book',
+      "Content-Type": "multipart/form-data",
+      "upload-type": "book",
     },
   })
 }
@@ -115,7 +115,7 @@ export const addNewBook = async (
   quantity: number,
   category: string,
 ) => {
-  return axios.post('/api/v1/book', {
+  return axios.post("/api/v1/book", {
     thumbnail,
     slider,
     mainText,
@@ -125,4 +125,31 @@ export const addNewBook = async (
     quantity,
     category,
   })
+}
+
+export const updateBook = async (
+  id: string,
+  mainText: string,
+  author: string,
+  price: number,
+  sold: number,
+  quantity: number,
+  category: string,
+  thumbnail: string,
+  slider: string[],
+) => {
+  return axios.put(`/api/v1/book/${id}`, {
+    mainText,
+    author,
+    price,
+    sold,
+    quantity,
+    category,
+    thumbnail,
+    slider,
+  })
+}
+
+export const deleteBook = async (id: string) => {
+  return axios.delete(`/api/v1/book/${id}`)
 }
