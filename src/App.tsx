@@ -21,7 +21,7 @@ import AdminBook from "./components/Admin/book";
 
 const Layout = () => {
     return (
-        <div className="min-h-screen">
+        <div className="h-full">
             <Header />
             <Outlet />
             <Footer />
