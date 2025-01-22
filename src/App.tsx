@@ -21,9 +21,11 @@ import AdminBook from "./components/Admin/book";
 
 const Layout = () => {
     return (
-        <div className="h-full">
-            <Header />
-            <Outlet />
+        <div className="h-full min-h-screen flex flex-col justify-between">
+            <div>
+                <Header />
+                <Outlet />
+            </div>
             <Footer />
         </div>
     );
