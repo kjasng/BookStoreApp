@@ -2,14 +2,13 @@ import useMobile from "@/hook/useMobile";
 import { doLogoutAction } from "@/redux/account/accountSlice";
 import { RootState } from "@/redux/store";
 import { logoutRequest } from "@/services/api";
-import Icon, {
+import {
     AlignLeftOutlined,
     SearchOutlined,
     ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { Avatar, Badge, Drawer, Dropdown, Input, message, Space } from "antd";
 import Link from "antd/es/typography/Link";
-import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";

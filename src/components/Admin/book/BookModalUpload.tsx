@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons"
 import {
   Col,
   Divider,
@@ -13,15 +13,14 @@ import {
   Upload,
   UploadFile,
 } from "antd"
+import { UploadChangeParam } from "antd/es/upload"
+import { useEffect, useState } from "react"
+import { v4 as uuidv4 } from "uuid"
 import {
-  addNewBook,
   callFetchCategory,
   callUploadBookImg,
-  updateBook,
+  updateBook
 } from "../../../services/api"
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons"
-import { v4 as uuidv4 } from "uuid"
-import { UploadChangeParam } from "antd/es/upload"
 
 interface IDataUpdate {
   _id: string
