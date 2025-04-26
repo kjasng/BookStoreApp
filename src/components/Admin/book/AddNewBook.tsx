@@ -1,16 +1,7 @@
 import { addNewBook, callUploadBookImg } from "@/services/api";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps, UploadFile } from "antd";
-import {
-    Button,
-    Form,
-    Input,
-    InputNumber,
-    message,
-    Modal,
-    Select,
-    Upload,
-} from "antd";
+import { Form, Input, InputNumber, message, Modal, Select, Upload } from "antd";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
 import type { UploadRequestOption } from "rc-upload/lib/interface";
 import { useState } from "react";
@@ -207,6 +198,12 @@ const AddNewBook = ({
         }
     };
 
+    const iconStyle = {
+        onPointerEnterCapture: () => {},
+        onPointerLeaveCapture: () => {},
+        className: "text-2xl",
+    };
+
     return (
         <Modal
             title="Thêm mới sách"
@@ -261,16 +258,10 @@ const AddNewBook = ({
                                         <div>
                                             {loadingThumbnail ? (
                                                 <LoadingOutlined
-                                                    className="text-2xl"
-                                                    onPointerEnterCapture={() => {}}
-                                                    onPointerLeaveCapture={() => {}}
+                                                    {...iconStyle}
                                                 />
                                             ) : (
-                                                <PlusOutlined
-                                                    className="text-2xl"
-                                                    onPointerEnterCapture={() => {}}
-                                                    onPointerLeaveCapture={() => {}}
-                                                />
+                                                <PlusOutlined {...iconStyle} />
                                             )}
                                         </div>
                                         <div style={{ marginTop: 8 }}>
@@ -312,16 +303,10 @@ const AddNewBook = ({
                                         <div>
                                             {loadingSlider ? (
                                                 <LoadingOutlined
-                                                    className="text-2xl"
-                                                    onPointerEnterCapture={() => {}}
-                                                    onPointerLeaveCapture={() => {}}
+                                                    {...iconStyle}
                                                 />
                                             ) : (
-                                                <PlusOutlined
-                                                    className="text-2xl"
-                                                    onPointerEnterCapture={() => {}}
-                                                    onPointerLeaveCapture={() => {}}
-                                                />
+                                                <PlusOutlined {...iconStyle} />
                                             )}
                                         </div>
                                         <div style={{ marginTop: 8 }}>
